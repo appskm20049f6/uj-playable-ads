@@ -10,6 +10,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#07060a;
   font-family:"Noto Serif TC","Microsoft JhengHei","PingFang TC",serif;
   user-select:none;-webkit-user-select:none;touch-action:manipulation}
 :root{--cityFull:url("{{CITY_FULL}}");--cityRuin:url("{{CITY_RUIN}}");
+  --icWood:url("{{IC_WOOD}}");--icIron:url("{{IC_IRON}}");--icTroop:url("{{IC_TROOP}}");
+  --icBuild:url("{{IC_BUILD}}");--icCity:url("{{IC_CITY}}");--icGeneral:url("{{IC_GENERAL}}");
+  --icPlan:url("{{IC_PLAN}}");--icArmy:url("{{IC_ARMY}}");--icWorld:url("{{IC_WORLD}}");
+  --icGift:url("{{IC_GIFT}}");
   --gold:#d8a33d;--goldL:#ffe9a8;--panel:linear-gradient(180deg,rgba(30,22,12,.96),rgba(11,8,5,.97))}
 #stage{position:absolute;left:50%;top:50%;width:720px;height:1280px;
   transform-origin:50% 50%;overflow:hidden;background:#07060a}
@@ -49,12 +53,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#07060a;
 .res{flex:1;display:flex;align-items:center;gap:7px;padding:7px 9px;border-radius:13px;
   background:var(--panel);border:2px solid #a3762c;
   box-shadow:0 0 0 1px rgba(255,230,170,.16) inset,0 6px 16px rgba(0,0,0,.65)}
-.res .ic{flex:0 0 38px;width:38px;height:38px;border-radius:10px;display:flex;
-  align-items:center;justify-content:center;font-size:23px;font-weight:900;color:#1b1207;
-  border:2px solid rgba(255,240,200,.55);text-shadow:0 1px 0 rgba(255,255,255,.4)}
-#resWood .ic{background:linear-gradient(180deg,#cfa96b,#7d5a24)}
-#resIron .ic{background:linear-gradient(180deg,#d5dee6,#798794)}
-#resTroop .ic{background:linear-gradient(180deg,#f09a8a,#a03026)}
+.res .ic{flex:0 0 42px;width:42px;height:42px;border-radius:10px;
+  background-size:contain;background-position:center;background-repeat:no-repeat;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.85))}
+#resWood .ic{background-image:var(--icWood)}
+#resIron .ic{background-image:var(--icIron)}
+#resTroop .ic{background-image:var(--icTroop)}
 .res .col{flex:1;min-width:0}
 .res b{display:block;font-size:29px;font-weight:900;line-height:1.05;color:var(--goldL);
   font-variant-numeric:tabular-nums;text-shadow:0 2px 0 #6b3d06}
@@ -88,7 +92,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#07060a;
   background:radial-gradient(circle at 36% 28%,rgba(58,40,18,.96),rgba(14,10,5,.97));
   box-shadow:0 0 0 1px rgba(255,230,170,.2) inset,0 6px 14px rgba(0,0,0,.7);
   display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:inherit}
-.sbtn .si{font-size:26px;font-weight:900;color:var(--goldL);line-height:1;text-shadow:0 2px 0 #4a2205}
+.sbtn .si{width:40px;height:40px;background-size:contain;background-position:center;
+  background-repeat:no-repeat;filter:drop-shadow(0 2px 4px rgba(0,0,0,.9))}
+#sbCounsel .si{background-image:var(--icPlan)}
+#sbGeneral .si{background-image:var(--icGeneral)}
+#sbBenefit .si{background-image:var(--icGift)}
 .sbtn .sl{margin-top:2px;font-size:14px;font-weight:700;color:#c9ad7c;letter-spacing:1px}
 .sbtn.hot{border-color:#ffd980;animation:sglow 1.5s ease-in-out infinite}
 @keyframes sglow{0%,100%{box-shadow:0 0 0 1px rgba(255,230,170,.2) inset,0 6px 14px rgba(0,0,0,.7),0 0 12px rgba(255,190,60,.4)}
@@ -106,13 +114,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#07060a;
 #nav.on{opacity:1}
 .nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
   cursor:pointer;position:relative;font-family:inherit;background:none;border:none}
-.nb .ni{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;
-  font-size:24px;font-weight:900;color:#a8937a;
-  background:linear-gradient(180deg,rgba(46,33,16,.9),rgba(16,11,6,.95));
-  border:2px solid rgba(163,118,44,.7)}
+.nb .ni{width:48px;height:48px;background-size:contain;background-position:center;
+  background-repeat:no-repeat;filter:grayscale(.55) brightness(.72) drop-shadow(0 2px 4px rgba(0,0,0,.9));
+  transition:filter .3s ease}
+#nb0 .ni{background-image:var(--icCity)}
+#nb1 .ni{background-image:var(--icGeneral)}
+#nb2 .ni{background-image:var(--icPlan)}
+#nb3 .ni{background-image:var(--icArmy)}
+#nb4 .ni{background-image:var(--icWorld)}
 .nb .nl{font-size:18px;font-weight:900;color:#a8937a;letter-spacing:1px}
-.nb.act .ni{color:#2a1a06;background:linear-gradient(180deg,#ffe08a,#c98a15);border-color:#ffe9a8;
-  box-shadow:0 0 16px rgba(255,190,60,.75)}
+.nb.act .ni{filter:none drop-shadow(0 0 12px rgba(255,190,60,.9));
+  filter:drop-shadow(0 0 12px rgba(255,190,60,.9)) drop-shadow(0 2px 4px rgba(0,0,0,.9))}
 .nb.act .nl{color:var(--goldL)}
 .nb.act::before{content:"";position:absolute;top:-2px;left:22%;right:22%;height:3px;border-radius:2px;
   background:linear-gradient(90deg,transparent,#ffe9a8,transparent)}
@@ -125,15 +137,22 @@ html,body{width:100%;height:100%;overflow:hidden;background:#07060a;
 .spot{position:absolute;width:126px;height:126px;margin:-63px 0 0 -63px;z-index:16;cursor:pointer}
 .spot.done{pointer-events:none;animation:spotout .5s ease forwards}
 @keyframes spotout{to{opacity:0;transform:scale(1.5)}}
-.spot .ring{position:absolute;inset:0;border-radius:50%;border:4px solid rgba(255,214,110,.9);
-  box-shadow:0 0 22px rgba(255,190,60,.7),0 0 18px rgba(255,190,60,.5) inset;
-  animation:spotp 1.6s ease-out infinite}
-.spot .ring:nth-child(2){animation-delay:.8s}
-@keyframes spotp{0%{transform:scale(.62);opacity:1}100%{transform:scale(1.08);opacity:0}}
-.spot .core{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px 0 0 -30px;
-  border-radius:14px;border:3px solid #fff2c8;display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(180deg,rgba(255,244,205,.96),rgba(214,152,32,.94));
-  box-shadow:0 0 20px rgba(255,200,80,.95);font-size:25px;font-weight:900;color:#5c3406}
+/* 工地＝方形牌位（靜態、標示位置）；採集節點＝圓形漣漪（限時撿取）。
+   刻意用不同形狀語言，讓玩家一眼分辨「蓋」和「撿」 */
+.spot .ring{position:absolute;left:50%;top:50%;width:92px;height:92px;margin:-46px 0 0 -46px;
+  border-radius:16px;border:3px solid rgba(216,163,61,.85);
+  background:linear-gradient(180deg,rgba(26,19,9,.72),rgba(10,7,4,.8));
+  box-shadow:0 0 0 1px rgba(255,230,170,.18) inset,0 6px 16px rgba(0,0,0,.7)}
+.spot .ring:nth-child(2){width:104px;height:104px;margin:-52px 0 0 -52px;border-radius:19px;
+  border:2px solid rgba(216,163,61,.35);background:none;box-shadow:none}
+.spot.rdy .ring:first-child{border-color:#ffd980;
+  box-shadow:0 0 0 1px rgba(255,240,190,.3) inset,0 6px 16px rgba(0,0,0,.7),0 0 20px rgba(255,190,60,.65);
+  animation:plaq 1.5s ease-in-out infinite}
+@keyframes plaq{0%,100%{box-shadow:0 0 0 1px rgba(255,240,190,.3) inset,0 6px 16px rgba(0,0,0,.7),0 0 14px rgba(255,190,60,.45)}
+  50%{box-shadow:0 0 0 1px rgba(255,240,190,.3) inset,0 6px 16px rgba(0,0,0,.7),0 0 32px rgba(255,190,60,.95)}}
+.spot .core{position:absolute;left:50%;top:50%;width:62px;height:62px;margin:-31px 0 0 -31px;
+  background:var(--icBuild) center/contain no-repeat;
+  filter:drop-shadow(0 0 14px rgba(255,200,80,.95)) drop-shadow(0 3px 6px rgba(0,0,0,.8))}
 .spot .nm{position:absolute;left:50%;top:100%;transform:translateX(-50%);white-space:nowrap;
   margin-top:1px;font-size:21px;font-weight:900;color:#fff;letter-spacing:2px;
   text-shadow:0 0 4px #000,0 2px 6px #000}
@@ -144,11 +163,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#07060a;
   text-shadow:0 1px 3px #000}
 .spot .cost em.no{color:#ff9d8b;border-color:rgba(255,90,60,.75)}
 .spot.poor{opacity:.6}
-.spot.poor .ring{animation:none;opacity:.22}
+.spot.poor .ring{animation:none;opacity:.5}
 .spot.poor .core{filter:grayscale(.65) brightness(.72)}
 .spot.rdy .core{animation:corerdy 1.1s ease-in-out infinite}
 @keyframes corerdy{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
-.spot .dot{position:absolute;top:-3px;right:-3px;width:18px;height:18px;border-radius:50%;display:none;
+.spot .dot{position:absolute;top:6px;right:6px;width:18px;height:18px;border-radius:50%;display:none;
   border:2px solid #fff;background:radial-gradient(circle at 34% 28%,#ff9c8c,#e81c1c 58%,#8c0a0a);
   box-shadow:0 0 10px rgba(255,50,50,.95);animation:dotp 1.05s ease-in-out infinite}
 .spot.rdy .dot{display:block}
@@ -156,16 +175,50 @@ html,body{width:100%;height:100%;overflow:hidden;background:#07060a;
 @keyframes corehit{0%{transform:scale(1)}45%{transform:scale(1.28)}100%{transform:scale(1)}}
 
 /* 採集節點 */
-.node{position:absolute;width:60px;height:60px;margin:-30px 0 0 -30px;z-index:17;cursor:pointer;
-  border-radius:14px;display:flex;align-items:center;justify-content:center;
-  font-size:25px;font-weight:900;color:#1b1207;border:3px solid rgba(255,255,255,.85);
-  box-shadow:0 0 22px rgba(255,220,140,.8),0 4px 10px rgba(0,0,0,.6);
-  animation:nodein .35s cubic-bezier(.2,1.5,.4,1),nodeb 1.5s ease-in-out infinite .35s}
-@keyframes nodein{from{opacity:0;transform:scale(.3)}to{opacity:1}}
-@keyframes nodeb{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
-.node.w{background:linear-gradient(180deg,#d8b478,#8a6428)}
-.node.i{background:linear-gradient(180deg,#dde5ec,#87949f)}
-.node.t{background:linear-gradient(180deg,#f4a596,#a83428)}
+.node{position:absolute;width:86px;height:86px;margin:-43px 0 0 -43px;z-index:17;cursor:pointer;
+  animation:nodein .42s cubic-bezier(.2,1.9,.35,1)}
+/* 本體圖示：持續彈跳 + 光暈呼吸，遠看就知道能點 */
+.node .body{position:absolute;inset:0;background-size:contain;background-position:center;
+  background-repeat:no-repeat;
+  filter:drop-shadow(0 0 18px rgba(255,214,120,.95)) drop-shadow(0 4px 8px rgba(0,0,0,.9));
+  animation:nodeb 1.05s ease-in-out infinite}
+/* 一圈圈往外擴的點擊漣漪（和開場點擊引導同一套語言）*/
+.node .rp{position:absolute;left:50%;top:50%;width:96px;height:96px;margin:-48px 0 0 -48px;
+  border-radius:50%;border:4px solid rgba(255,224,140,.95);pointer-events:none;
+  box-shadow:0 0 20px rgba(255,190,60,.8);animation:nodering 1.25s ease-out infinite}
+.node .rp:nth-child(2){animation-delay:.42s}
+.node .rp:nth-child(3){animation-delay:.84s}
+@keyframes nodering{0%{transform:scale(.5);opacity:.95}100%{transform:scale(1.5);opacity:0}}
+/* 倒數環：時間快到會縮小，製造「快點我」的急迫感 */
+.node .tm{position:absolute;left:50%;top:50%;width:104px;height:104px;margin:-52px 0 0 -52px;
+  border-radius:50%;border:3px solid rgba(255,255,255,.5);pointer-events:none;
+  animation:nodetm 5.2s linear forwards}
+@keyframes nodetm{0%{transform:scale(1);opacity:.55;border-color:rgba(255,255,255,.5)}
+  70%{opacity:.5}88%{border-color:rgba(255,90,60,.95);opacity:.95}
+  100%{transform:scale(.62);opacity:0;border-color:rgba(255,60,40,1)}}
+/* 獎勵標籤：先讓人看到能拿什麼再點 */
+.node .lbl{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);margin-bottom:6px;
+  white-space:nowrap;padding:2px 11px;border-radius:11px;pointer-events:none;
+  background:linear-gradient(180deg,rgba(30,20,8,.95),rgba(10,7,3,.96));
+  border:2px solid #ffd980;font-size:19px;font-weight:900;color:#ffe9a8;
+  text-shadow:0 1px 3px #000;box-shadow:0 0 14px rgba(255,190,60,.6);
+  animation:lblb 1.05s ease-in-out infinite}
+@keyframes lblb{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,-5px)}}
+/* 第一顆節點多給一隻手指教學 */
+.node .hand{position:absolute;left:56%;top:52%;width:56px;pointer-events:none;
+  filter:drop-shadow(0 3px 8px rgba(0,0,0,.9));animation:handtap 1s ease-in-out infinite}
+@keyframes handtap{0%,100%{transform:translate(0,0) scale(1)}45%{transform:translate(-7px,-16px) scale(.9)}}
+.node::before{content:"";position:absolute;left:50%;top:50%;width:130px;height:130px;
+  margin:-65px 0 0 -65px;border-radius:50%;z-index:-1;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(255,214,120,.5),rgba(255,180,60,0) 72%);
+  animation:nglow 1.05s ease-in-out infinite}
+@keyframes nglow{0%,100%{opacity:.6;transform:scale(.95)}50%{opacity:1;transform:scale(1.08)}}
+@keyframes nodein{0%{opacity:0;transform:scale(.25) rotate(-14deg)}
+  60%{opacity:1;transform:scale(1.14) rotate(4deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes nodeb{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-11px) scale(1.05)}}
+.node.w .body{background-image:var(--icWood)}
+.node.i .body{background-image:var(--icIron)}
+.node.t .body{background-image:var(--icTroop)}
 .node.gone{pointer-events:none;animation:nodeout .35s ease forwards}
 @keyframes nodeout{to{opacity:0;transform:scale(1.7)}}
 
@@ -198,7 +251,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#07060a;
 .slot.lit .card{border-color:#ffe08a;box-shadow:0 0 0 1px rgba(255,240,190,.35) inset,
   0 8px 20px rgba(0,0,0,.75),0 0 26px rgba(255,190,60,.6)}
 .card img{position:absolute;left:50%;top:-6px;width:206px;transform:translateX(-50%);
-  filter:brightness(0);transition:filter .55s ease}
+  filter:brightness(.3) grayscale(1) contrast(.85);transition:filter .55s ease}
 .slot.lit .card img{filter:none}
 .card .stars{position:absolute;top:5px;left:7px;font-size:16px;color:#ffd166;letter-spacing:1px;
   text-shadow:0 1px 3px #000;opacity:0;transition:opacity .4s ease .25s}
@@ -275,7 +328,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#07060a;
 #cres.bad .rv{color:#c9c2bb;text-shadow:0 4px 0 #2b2622}
 #cres .rc{margin-top:8px;font-size:23px;font-weight:700;color:#f3e5c6;text-align:center;line-height:1.45}
 #cres .rr{margin-top:12px;font-size:27px;font-weight:900;color:#8ee08a;text-align:center}
-#cres .rg{margin-top:12px;font-size:20px;font-weight:700;color:#c9b58e;text-align:center;
+#cres .rby{margin-top:8px;font-size:20px;font-weight:900;color:#e9c07a;text-align:right;
+  padding-right:6px;letter-spacing:2px}
+#cres .rg{margin-top:10px;font-size:20px;font-weight:700;color:#c9b58e;text-align:center;
   animation:blink 1.4s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:.45}50%{opacity:1}}
 
@@ -380,11 +435,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#07060a;
 
   <div id="top">
     <div id="resRow">
-      <div class="res" id="resWood"><span class="ic">木</span>
+      <div class="res" id="resWood"><span class="ic"></span>
         <span class="col"><b id="nWood">0</b><i id="rWood">+3 / 秒</i></span></div>
-      <div class="res" id="resIron"><span class="ic">鐵</span>
+      <div class="res" id="resIron"><span class="ic"></span>
         <span class="col"><b id="nIron">0</b><i id="rIron">+2 / 秒</i></span></div>
-      <div class="res" id="resTroop"><span class="ic">兵</span>
+      <div class="res" id="resTroop"><span class="ic"></span>
         <span class="col"><b id="nTroop">0</b><i id="rTroop">+2 / 秒</i></span></div>
     </div>
     <div id="phaseRow">
@@ -398,11 +453,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#07060a;
 
   <div id="side">
     <button class="sbtn" id="sbCounsel"><span class="sdot"></span>
-      <span class="si">謀</span><span class="sl">軍師</span></button>
+      <span class="si"></span><span class="sl">軍師</span></button>
     <button class="sbtn" id="sbGeneral"><span class="sdot"></span>
-      <span class="si">將</span><span class="sl">名將</span></button>
+      <span class="si"></span><span class="sl">名將</span></button>
     <button class="sbtn" id="sbBenefit"><span class="sdot"></span>
-      <span class="si">福</span><span class="sl">福利</span></button>
+      <span class="si"></span><span class="sl">福利</span></button>
   </div>
 
   <div id="spots"></div>
@@ -428,11 +483,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#07060a;
   </div>
 
   <div id="nav">
-    <button class="nb act" id="nb0"><span class="ndot"></span><span class="ni">城</span><span class="nl">內城</span></button>
-    <button class="nb" id="nb1"><span class="ndot"></span><span class="ni">將</span><span class="nl">名將</span></button>
-    <button class="nb" id="nb2"><span class="ndot"></span><span class="ni">謀</span><span class="nl">謀略</span></button>
-    <button class="nb" id="nb3"><span class="ndot"></span><span class="ni">軍</span><span class="nl">軍務</span></button>
-    <button class="nb" id="nb4"><span class="ndot"></span><span class="ni">界</span><span class="nl">世界</span></button>
+    <button class="nb act" id="nb0"><span class="ndot"></span><span class="ni"></span><span class="nl">內城</span></button>
+    <button class="nb" id="nb1"><span class="ndot"></span><span class="ni"></span><span class="nl">名將</span></button>
+    <button class="nb" id="nb2"><span class="ndot"></span><span class="ni"></span><span class="nl">謀略</span></button>
+    <button class="nb" id="nb3"><span class="ndot"></span><span class="ni"></span><span class="nl">軍務</span></button>
+    <button class="nb" id="nb4"><span class="ndot"></span><span class="ni"></span><span class="nl">世界</span></button>
   </div>
 
   <div id="banner"><div class="n1" id="bn1">關羽歸隊</div><div class="n2" id="bn2">兵力產出 ×1.5</div></div>
@@ -441,9 +496,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#07060a;
 
   <div id="counsel">
     <div id="cpanel">
-      <div id="chead"><span class="ct">軍師諫言</span><span class="cn" id="cnum">第 1 策 / 3</span></div>
+      <div id="chead"><span class="ct" id="chd">軍師諫言</span><span class="cn" id="cnum">第 1 策 / 3</span></div>
       <div id="cbody">
-        <div id="cface"><img data-a="zhuge" alt="諸葛亮"><div class="cfn">諸葛亮</div></div>
+        <div id="cface"><img id="cfaceImg" data-a="zhuge" alt=""><div class="cfn" id="cfn">諸葛亮</div></div>
         <div id="ctext"><span id="cq"></span><span class="q">主公，當如何？</span></div>
       </div>
       <div id="copts"></div>
@@ -451,6 +506,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#07060a;
         <div class="rv" id="crv">上 策</div>
         <div class="rc" id="crc"></div>
         <div class="rr" id="crr"></div>
+        <div class="rby" id="crby"></div>
         <div class="rg">點擊任意處繼續</div>
       </div>
     </div>
@@ -504,6 +560,11 @@ function clickThrough(){
 }
 
 /* ===== 資源：w 木材 / i 鐵礦 / t 兵力 ===== */
+var HAND='data:image/svg+xml;utf8,'+encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'+
+  '<path d="M26 6c3 0 5 2.4 5 5.4V30l4.4-3.6c2.4-2 5.8-1.7 7.7.6l.4.5 6.6 8.6c1.6 2 2.4 4.6 2.4 7.2v5.4'+
+  'c0 5-4 9.3-9 9.3H31c-3.4 0-6.6-1.7-8.5-4.6L11 36.6c-1.6-2.5-.9-5.8 1.6-7.4 2.2-1.4 5-1 6.8.8L21 31.6V11.4'+
+  'C21 8.4 23 6 26 6z" fill="%23fff8e2" stroke="%237a3c06" stroke-width="3" stroke-linejoin="round"/></svg>');
 var R={w:40,i:20,t:20};
 var BASE={w:3,i:2,t:2}, ADD={w:0,i:0,t:0}, MUL={w:1,i:1,t:1};
 var RNAME={w:'木材',i:'鐵礦',t:'兵力'}, RCH={w:'木',i:'鐵',t:'兵'};
@@ -526,25 +587,29 @@ var GENERALS=[
 ];
 
 /* ===== 出謀劃策：三國情境二選一 ===== */
+/* 三道策略各由「剛歸隊的那位」獻策：頭像、標題、語氣都跟著換 */
 var PLANS=[
-  {q:'敵軍屯糧於烏巢，營中守備鬆懈。',
+  {by:0, key:'guan', who:'關 羽', hd:'關羽獻策',
+   q:'主公，敵軍屯糧於烏巢，營中守備鬆懈。關某願親往一趟。',
    a:{t:'遣輕騎夜襲，焚其糧草',s:'以寡擊眾，斷其根本',good:true,
-      c:'糧草一炬，敵軍不戰自亂。',r:{t:150,w:80,i:60}},
+      c:'關某率輕騎入營，糧草一炬，敵軍不戰自亂。',r:{t:150,w:80,i:60}},
    b:{t:'正面壓上，強攻其營',s:'兵力硬碰，勝負難料',good:false,
-      c:'雖破一營，我軍亦傷。',r:{t:60,w:20,i:20}}},
-  {q:'江東連日大霧，敵船以鐵索相連。',
+      c:'雖破一營，我軍亦有折損。',r:{t:60,w:20,i:20}}},
+  {by:1, key:'zhuge', who:'諸葛亮', hd:'軍師諫言',
+   q:'主公，江東連日大霧，敵船以鐵索相連。亮已算定風向。',
    a:{t:'借風勢以火船焚之',s:'順風而攻，一舉功成',good:true,
-      c:'火借風勢，連環船盡焚。',r:{t:180,w:60,i:120}},
+      c:'火借風勢，連環船盡焚，此乃天時。',r:{t:180,w:60,i:120}},
    b:{t:'遣使議和，暫避鋒芒',s:'保全兵力，另尋良機',good:false,
-      c:'雖免一戰，戰機亦失。',r:{t:70,w:30,i:30}}},
-  {q:'洛陽城高糧足，我軍久攻不下。',
+      c:'雖免一戰，戰機亦隨風而去。',r:{t:70,w:30,i:30}}},
+  {by:2, key:'huang', who:'皇甫嵩', hd:'老將建言',
+   q:'主公，洛陽城高糧足，我軍久攻不下。老夫倒有一策。',
    a:{t:'圍城斷援，待其自亂',s:'不戰而屈人之兵',good:true,
-      c:'糧道一斷，城中自開。',r:{t:220,w:100,i:100}},
+      c:'老夫斷其糧道，不出十日，城中自開。',r:{t:220,w:100,i:100}},
    b:{t:'全軍猛攻，速戰速決',s:'以傷亡換時間',good:false,
-      c:'雖登其城，士卒折損。',r:{t:80,w:40,i:40}}}
+      c:'雖登其城，士卒折損不少。',r:{t:80,w:40,i:40}}}
 ];
 var MARCH_COST=600;
-var G={built:0,gen:0,plan:0,busy:false,over:false,started:false,phase:'build',marching:false};
+var G={built:0,gen:0,plan:0,taught:0,busy:false,over:false,started:false,phase:'build',marching:false};
 
 /* ===== 工地 ===== */
 BUILDINGS.forEach(function(b,i){
@@ -553,7 +618,7 @@ BUILDINGS.forEach(function(b,i){
   var cost='';
   ['w','i','t'].forEach(function(k){ if(b.cost[k]>0) cost+='<em data-k="'+k+'">'+RCH[k]+b.cost[k]+'</em>' });
   d.innerHTML='<div class="ring"></div><div class="ring"></div><span class="dot"></span>'+
-    '<div class="core">建</div><div class="nm">'+b.n+'</div><div class="cost">'+cost+'</div>';
+    '<div class="core"></div><div class="nm">'+b.n+'</div><div class="cost">'+cost+'</div>';
   d.addEventListener('pointerdown',function(){ tryBuild(d,i) });
   $('spots').appendChild(d);
   var p=document.createElement('div'); p.className='patch'; p.dataset.i=i;
@@ -578,7 +643,7 @@ function startGame(){
   $('hook').classList.add('fade');
   setTimeout(function(){ $('hook').classList.add('off') },700);
   $('top').classList.add('on'); $('side').classList.add('on'); $('nav').classList.add('on');
-  nodeLoop(); render();
+  spawnNode(); nodeLoop(); render();
 }
 $('hook').addEventListener('pointerdown',startGame);
 setTimeout(startGame,4200);
@@ -598,18 +663,48 @@ function nodeLoop(){
   if(G.phase!=='counsel' && $('nodes').children.length<3) spawnNode();
   setTimeout(nodeLoop,900+Math.random()*700);
 }
+/* 節點不能生在工地（含名稱與成本標）上，也不能疊在已生成的節點上 */
+function pickNodePos(){
+  for(var tries=0;tries<40;tries++){
+    var x=95+Math.random()*530, y=265+Math.random()*505, ok=true;
+    for(var i=0;i<BUILDINGS.length;i++){
+      var b=BUILDINGS[i], d=$('spots').querySelector('.spot[data-i="'+i+'"]');
+      if(d&&d.classList.contains('done')) continue;
+      // 工地本體 + 下方名稱與成本標一併避開
+      if(Math.abs(x-b.x)<170 && y>b.y-110 && y<b.y+160){ ok=false; break }
+    }
+    if(ok){
+      var ns=$('nodes').children;
+      for(var j=0;j<ns.length;j++){
+        var nx=parseFloat(ns[j].style.left), ny=parseFloat(ns[j].style.top);
+        if(Math.abs(x-nx)<125&&Math.abs(y-ny)<125){ ok=false; break }
+      }
+    }
+    if(ok) return {x:x,y:y};
+  }
+  return null;
+}
 function spawnNode(){
   var keys=['w','i','t'], k=keys[Math.floor(Math.random()*3)];
-  var x=100+Math.random()*520, y=270+Math.random()*520;
+  var pos=pickNodePos(); if(!pos) return;
+  var x=pos.x, y=pos.y;
   var n=document.createElement('div');
-  n.className='node '+k; n.textContent=RCH[k];
+  n.className='node '+k;
   n.style.left=x+'px'; n.style.top=y+'px';
   var amt=Math.round((10+Math.random()*10)*(1+G.built*0.5));
+  var teach = (G.taught<2) ? '<img class="hand" src="'+HAND+'" alt="">' : '';
+  if(G.taught<2) G.taught++;
+  n.innerHTML='<div class="rp"></div><div class="rp"></div><div class="rp"></div>'+
+    '<div class="tm"></div><div class="body"></div>'+
+    '<div class="lbl">＋'+amt+' '+RNAME[k]+'</div>'+teach;
   n.addEventListener('pointerdown',function(){
     if(n.classList.contains('gone')) return;
     R[k]+=amt;
-    floatText('+'+amt+' '+RNAME[k],x,y-38,k);
-    bump(k); sparkAt(x,y,5);
+    floatText('＋'+amt+' '+RNAME[k],x,y-44,k);
+    bump(k); sparkAt(x,y,9);
+    var rw=document.createElement('div'); rw.className='rep';
+    rw.style.left=x+'px'; rw.style.top=y+'px'; rw.style.borderWidth='5px';
+    $('nodes').appendChild(rw); setTimeout(function(){rw.remove()},820);
     n.classList.add('gone'); setTimeout(function(){n.remove()},360);
     renderNums();
   });
@@ -655,7 +750,7 @@ function finishBuild(el,i){
   render();
 
   if(G.built%2===0 && G.gen<GENERALS.length) setTimeout(returnGeneral,520);
-  else if(G.built>=BUILDINGS.length) setTimeout(toCounsel,700);
+  else if(G.built>=BUILDINGS.length) setTimeout(function(){ if(G.plan>=PLANS.length) toMarch(); else openPlan() },700);
 }
 
 /* ===== 名將歸隊（給產出加成）===== */
@@ -677,28 +772,27 @@ function returnGeneral(){
       var pd=pending; pending=null;
       tryBuild(pd.el,pd.i);              // 把剛才被擋掉的那一下補回去
     } else pending=null;
-    if(G.built>=BUILDINGS.length) toCounsel();
+    openPlan();                          // 名將一歸隊，隨即獻策
   },1350);
   setTimeout(function(){ $('speech').classList.remove('on') },2700);
 }
 
 /* ===== 出謀劃策 ===== */
-function toCounsel(){
-  if(G.phase!=='build'||G.over) return;
-  G.phase='counsel';
-  $('cityRuin').style.opacity=0; $('dust').style.opacity=0;
-  $('speech').classList.remove('on');
-  $('sbCounsel').classList.add('hot');
-  $('nb2').classList.add('tip');
-  $('phaseTag').textContent='謀略';
-  $('phaseTxt').textContent='軍師諫言 ‧ 定策而後動';
-  render();
-  toast('城已立 ‧ 請聽軍師諫言');
-  setTimeout(openPlan,900);
-}
 function openPlan(){
-  if(G.plan>=PLANS.length){ toMarch(); return }
+  if(G.over) return;
+  if(G.plan>=PLANS.length){ if(G.built>=BUILDINGS.length) toMarch(); return }
+  G.phase='counsel';
+  $('speech').classList.remove('on');
+  $('sbCounsel').classList.add('hot'); $('nb2').classList.add('tip');
+  $('nb0').classList.remove('act'); $('nb2').classList.add('act');
+  $('phaseTag').textContent='謀略';
+  $('phaseTxt').textContent='軍師獻策 ‧ 定策而後動';
+  render();
   var p=PLANS[G.plan];
+  var A=document.getElementById('ASSETS').dataset;
+  $('chd').textContent=p.hd;                       // 關羽獻策 / 軍師諫言 / 老將建言
+  $('cfaceImg').src=A[p.key];                      // 換成獻策者的頭像
+  $('cfn').textContent=p.who;
   $('cnum').textContent='第 '+(G.plan+1)+' 策 / '+PLANS.length;
   $('cq').textContent=p.q;
   $('cres').classList.remove('on','good','bad');
@@ -719,6 +813,7 @@ function pickPlan(key){
   cr.classList.add('on', o.good?'good':'bad');
   $('crv').textContent=o.good?'上 策':'下 策';
   $('crc').textContent=o.c;
+  $('crby').textContent='— '+p.who;
   var got=[];
   ['t','w','i'].forEach(function(k){ if(o.r[k]){ R[k]+=o.r[k]; got.push(RNAME[k]+' +'+o.r[k]); bump(k) } });
   $('crr').textContent=got.join(' ‧ ');
@@ -729,8 +824,15 @@ function pickPlan(key){
     cr.classList.remove('on');
     $('counsel').classList.remove('on');
     G.plan++;
+    $('sbCounsel').classList.remove('hot'); $('nb2').classList.remove('tip','act');
+    if(G.built>=BUILDINGS.length){ render(); setTimeout(toMarch,500); return }
+    // 還有工地沒蓋 → 回到營建階段
+    G.phase='build';
+    $('nb0').classList.add('act');
+    $('phaseTag').textContent='營建';
+    $('phaseTxt').textContent='續建城池，再迎老將';
     render();
-    setTimeout(function(){ if(G.plan<PLANS.length) openPlan(); else toMarch() },500);
+    toast('計策已定 ‧ 續建城池');
   }
   $('counsel').onclick=function(){ next(); $('counsel').onclick=null };
   setTimeout(function(){ if(!done) next() },2600);
@@ -740,6 +842,7 @@ function pickPlan(key){
 function toMarch(){
   if(G.marching||G.over) return;
   G.marching=true; G.phase='march';
+  $('cityRuin').style.opacity=0; $('dust').style.opacity=0;
   $('sbCounsel').classList.remove('hot');
   $('nb2').classList.remove('tip');
   $('nb0').classList.remove('act'); $('nb4').classList.add('act');
@@ -767,14 +870,14 @@ $('march').addEventListener('click',function(){
 /* ===== 側邊 / 導覽（引導用，不做假功能）===== */
 $('sbCounsel').addEventListener('click',function(){
   if(G.phase==='counsel'&&G.plan<PLANS.length){ openPlan(); return }
-  toast(G.phase==='build'?'先把城立起來，再議謀略':'謀略已定，該出兵了');
+  toast(G.phase==='march'?'謀略已定，該出兵了':'名將歸隊時，軍師自會獻策');
 });
 $('sbGeneral').addEventListener('click',function(){
   toast(G.gen<3?('名將歸隊 '+G.gen+' / 3 ‧ 續建城池'):'三將已歸位');
 });
 $('sbBenefit').addEventListener('click',function(){ toast('新服加開 ‧ 開服福利多重') });
 [['nb0','內城：點工地築城'],['nb1','名將：每建兩處迎回一將'],
- ['nb2','謀略：立城後開放'],['nb3','軍務：徵集資源'],['nb4','世界：點兵出征']]
+ ['nb2','謀略：名將歸隊時獻策'],['nb3','軍務：徵集資源'],['nb4','世界：點兵出征']]
 .forEach(function(a){ $(a[0]).addEventListener('click',function(){ toast(a[1]) }) });
 
 var toastT=null;

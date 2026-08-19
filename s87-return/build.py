@@ -16,6 +16,16 @@ MAP = {
     '{{LOGO}}':      ('assets/logo.png',      'image/png'),
     '{{IOS}}':       ('assets/ios.png',       'image/png'),
     '{{GP}}':        ('assets/gp.png',        'image/png'),
+    '{{IC_WOOD}}':   ('assets/ic_wood.png',   'image/png'),
+    '{{IC_IRON}}':   ('assets/ic_iron.png',   'image/png'),
+    '{{IC_TROOP}}':  ('assets/ic_troop.png',  'image/png'),
+    '{{IC_BUILD}}':  ('assets/ic_build.png',  'image/png'),
+    '{{IC_CITY}}':   ('assets/ic_city.png',   'image/png'),
+    '{{IC_GENERAL}}':('assets/ic_general.png','image/png'),
+    '{{IC_PLAN}}':   ('assets/ic_plan.png',   'image/png'),
+    '{{IC_ARMY}}':   ('assets/ic_army.png',   'image/png'),
+    '{{IC_WORLD}}':  ('assets/ic_world.png',  'image/png'),
+    '{{IC_GIFT}}':   ('assets/ic_gift.png',   'image/png'),
 }
 
 with open(os.path.join(HERE, 'src', 'template.html'), encoding='utf-8') as f:
