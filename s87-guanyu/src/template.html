@@ -80,10 +80,30 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
 @keyframes bob{0%,100%{transform:translateY(0) rotate(-.4deg)}50%{transform:translateY(-15px) rotate(.4deg)}}
 #hero.hit img{animation:hit .32s ease}
 @keyframes hit{0%{transform:scale(1)}35%{transform:scale(1.045) translateY(-10px)}100%{transform:scale(1)}}
+/* --glow：0→1 隨庫銀與戰力累積，越有錢炫光越亮 */
 #aura{position:absolute;left:50%;bottom:230px;width:540px;height:120px;transform:translateX(-50%);
-  z-index:9;background:radial-gradient(50% 50% at 50% 50%,rgba(255,190,60,.4),rgba(255,150,30,0) 70%);
-  filter:blur(2px);animation:pulse 2.4s ease-in-out infinite}
+  z-index:9;background:radial-gradient(50% 50% at 50% 50%,
+    rgba(255,200,80,calc(.3 + var(--glow,0)*.6)),rgba(255,150,30,0) 70%);
+  filter:blur(2px) saturate(calc(1 + var(--glow,0)*.6));
+  animation:pulse 2.4s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:.5;transform:translateX(-50%) scale(.95)}50%{opacity:1;transform:translateX(-50%) scale(1.08)}}
+/* 背光暈：整個人被金光包起來，強度跟著 --glow 走 */
+#halo{position:absolute;left:50%;bottom:250px;width:760px;height:760px;
+  transform:translateX(-50%);z-index:8;pointer-events:none;
+  opacity:calc(var(--glow,0)*.92);
+  background:radial-gradient(closest-side,
+    rgba(255,232,150,.55) 0%,rgba(255,190,60,.34) 34%,rgba(255,140,20,.14) 58%,rgba(255,120,0,0) 78%);
+  filter:blur(6px);animation:halob 3.6s ease-in-out infinite}
+@keyframes halob{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.07)}}
+/* 金塵上升：有錢之後才看得見 */
+#motes{position:absolute;left:50%;bottom:236px;width:560px;height:520px;
+  transform:translateX(-50%);z-index:9;pointer-events:none;
+  opacity:calc(var(--glow,0)*.95)}
+#motes i{position:absolute;bottom:0;width:9px;height:9px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#fff8dc,#ffc63c 60%,rgba(224,138,16,0) 100%);
+  box-shadow:0 0 12px rgba(255,200,80,.95);animation:rise 4.2s linear infinite}
+@keyframes rise{0%{transform:translateY(0) scale(.6);opacity:0}
+  14%{opacity:1}100%{transform:translateY(-460px) scale(1.05);opacity:0}}
 
 /* 開場點擊引導 */
 #tapGuide{position:absolute;left:50%;bottom:498px;transform:translateX(-50%);
@@ -113,6 +133,24 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
   text-shadow:0 2px 4px #000}
 #combo.pop .n{animation:cpop .2s ease}
 @keyframes cpop{0%{transform:scale(1)}45%{transform:scale(1.3)}100%{transform:scale(1)}}
+/* COMBO 滿級：數字轉爆擊態 */
+#combo .crit{display:none}
+#combo.max .n{font-size:104px;color:#fff;
+  text-shadow:0 0 10px #fff,0 0 26px #ffb03c,0 0 52px #ff3d0a,0 5px 0 #7a1f04;
+  animation:maxjit .16s linear infinite}
+@keyframes maxjit{0%{transform:translate(0,0) scale(1)}25%{transform:translate(-3px,2px) scale(1.02)}
+  50%{transform:translate(2px,-2px) scale(1)}75%{transform:translate(-2px,-1px) scale(1.03)}
+  100%{transform:translate(0,0) scale(1)}}
+#combo.max .l{color:#ff9a5a;text-shadow:0 2px 4px #000,0 0 16px rgba(255,90,20,.9)}
+#combo.max .crit{display:inline-block;margin-top:6px;padding:3px 14px;border-radius:11px;
+  font-size:29px;font-weight:900;color:#fff;letter-spacing:4px;
+  background:linear-gradient(180deg,#ff6a2b,#a81a05);border:2px solid #ffd980;
+  box-shadow:0 0 26px rgba(255,90,20,.95);animation:critp .42s ease-in-out infinite alternate}
+@keyframes critp{from{transform:scale(1)}to{transform:scale(1.09)}}
+#combo.max.pop::before{content:"";position:absolute;right:38px;top:22px;width:24px;height:24px;
+  margin:-12px -12px 0 0;border-radius:50%;border:5px solid rgba(255,150,50,.95);
+  animation:critring .42s ease-out forwards}
+@keyframes critring{0%{transform:scale(.4);opacity:1}100%{transform:scale(9);opacity:0}}
 #rate.hot{color:#ffd166;text-shadow:0 1px 3px #000,0 0 18px rgba(255,190,60,.9)}
 
 /* 飄字 */
@@ -120,24 +158,45 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
   white-space:nowrap;text-shadow:0 2px 0 #6b3d06,0 0 14px rgba(255,190,60,.8);
   pointer-events:none;animation:fly 1s ease-out forwards}
 .float.small{font-size:31px}
+.float.crit{font-size:60px;color:#fff;
+  text-shadow:0 0 10px #fff,0 0 26px #ffb03c,0 0 54px #ff3d0a,0 5px 0 #7a1f04}
 @keyframes fly{0%{opacity:0;transform:translate(-50%,0) scale(.7)}
   18%{opacity:1;transform:translate(-50%,-24px) scale(1.15)}
   100%{opacity:0;transform:translate(-50%,-150px) scale(1)}}
 .float.red{color:#ff8f7a;text-shadow:0 2px 0 #5a0f0f,0 0 14px rgba(255,80,60,.8)}
 
 /* ---------- 底部按鈕 ---------- */
-#bottom{position:absolute;left:0;right:0;bottom:0;padding:0 34px 34px;z-index:22}
-#tapHint{width:fit-content;margin:0 auto 12px;padding:5px 22px;border-radius:20px;
+#bottom{position:absolute;left:0;right:0;bottom:0;padding:0 26px 28px;z-index:22}
+#tapHint{width:fit-content;margin:0 auto 10px;padding:5px 22px;border-radius:20px;
   background:rgba(8,5,3,.62);text-align:center;font-size:23px;font-weight:700;color:#f0dcae;
   text-shadow:0 2px 6px #000;animation:blink 2s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:.5}50%{opacity:1}}
-#subrow{display:flex;gap:14px;margin-bottom:14px}
-.sub{position:relative;flex:1;height:98px;border:2px solid #c99a3c;border-radius:16px;
+/* 建設列：三個可購買建築 */
+#bldrow{display:flex;gap:11px;margin-bottom:11px}
+.bld{position:relative;flex:1;padding:9px 4px 8px;border:2px solid #a3762c;border-radius:14px;
+  background:linear-gradient(180deg,rgba(42,28,11,.96),rgba(14,9,4,.96));
+  font-family:inherit;cursor:pointer;text-align:center;
+  box-shadow:0 0 0 1px rgba(255,230,170,.14) inset,0 6px 0 #241607,0 10px 20px rgba(0,0,0,.6)}
+.bld:active{transform:translateY(4px);box-shadow:0 0 0 1px rgba(255,230,170,.14) inset,0 2px 0 #241607}
+.bld .nm{display:block;font-size:27px;font-weight:900;color:#ffe9a8;letter-spacing:2px;
+  line-height:1.15;text-shadow:0 2px 0 #4a2205}
+.bld .ef{display:block;font-size:19px;font-weight:900;color:#8ee08a;line-height:1.3}
+.bld .pr{display:block;font-size:19px;font-weight:700;color:#e2bd7a;line-height:1.3}
+.bld .lv{position:absolute;top:-9px;right:-5px;min-width:34px;padding:1px 6px;border-radius:9px;
+  background:linear-gradient(180deg,#8f1d1d,#4a0d0d);border:2px solid #d8a33d;
+  font-size:17px;font-weight:900;color:#ffe9a8;box-shadow:0 2px 8px rgba(0,0,0,.7)}
+.bld.dim{filter:grayscale(.62) brightness(.7)}
+.bld.ready{border-color:#ffd980;animation:bldglow 1.7s ease-in-out infinite}
+@keyframes bldglow{0%,100%{box-shadow:0 0 0 1px rgba(255,230,170,.14) inset,0 6px 0 #241607,0 10px 20px rgba(0,0,0,.6),0 0 14px rgba(255,190,60,.35)}
+  50%{box-shadow:0 0 0 1px rgba(255,230,170,.14) inset,0 6px 0 #241607,0 10px 20px rgba(0,0,0,.6),0 0 30px rgba(255,190,60,.8)}}
+
+#subrow{display:flex;gap:14px;margin-bottom:12px}
+.sub{position:relative;flex:1;height:88px;border:2px solid #c99a3c;border-radius:16px;
   background:linear-gradient(180deg,rgba(46,30,12,.96),rgba(16,10,5,.96));
   font-family:inherit;cursor:pointer;overflow:hidden;
   box-shadow:0 0 0 1px rgba(255,230,170,.18) inset,0 8px 0 #2a1a08,0 12px 24px rgba(0,0,0,.6)}
 .sub:active{transform:translateY(5px);box-shadow:0 0 0 1px rgba(255,230,170,.18) inset,0 3px 0 #2a1a08}
-.sub .t{display:block;font-size:36px;font-weight:900;color:#ffe9a8;letter-spacing:5px;
+.sub .t{display:block;font-size:33px;font-weight:900;color:#ffe9a8;letter-spacing:5px;
   text-shadow:0 2px 0 #4a2205}
 .sub .s{display:block;font-size:20px;font-weight:700;color:#c9ad7c;margin-top:1px}
 .sub.dim{filter:grayscale(.6) brightness(.72)}
@@ -154,7 +213,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
   font-size:38px;font-weight:900;color:#ffd166}
 .sub.cool .cd{display:flex}
 
-#fightBtn{position:relative;width:100%;height:122px;border:none;border-radius:22px;
+#fightBtn{position:relative;width:100%;height:116px;border:none;border-radius:22px;
   background:linear-gradient(180deg,#ffe9a8 0%,#f5c33c 26%,#d98f1c 62%,#a35c07 100%);
   box-shadow:0 0 0 3px #7a4a0c,0 12px 0 #5b2f05,0 20px 34px rgba(0,0,0,.65),
     0 0 40px rgba(255,170,40,.45);
@@ -197,6 +256,34 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
 @keyframes raysin{0%{opacity:0;transform:scale(.35) rotate(0deg)}
   16%{opacity:.95;transform:scale(1) rotate(14deg)}
   100%{opacity:0;transform:scale(1.3) rotate(44deg)}}
+/* 大勝：爆金幣 */
+.gcoin{position:absolute;width:46px;height:46px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle at 34% 26%,#fffbe6 0%,#ffe07a 34%,#f0b52c 62%,#a4670c 100%);
+  border:3px solid #7d4c08;box-shadow:0 0 18px rgba(255,200,80,.9),0 4px 10px rgba(0,0,0,.5);
+  display:flex;align-items:center;justify-content:center;
+  font-size:25px;font-weight:900;color:#7d4c08;text-shadow:0 1px 0 rgba(255,255,255,.6)}
+#winWave{position:absolute;left:50%;top:44%;width:60px;height:60px;margin:-30px 0 0 -30px;
+  border-radius:50%;border:10px solid rgba(255,214,110,.95);opacity:0;
+  box-shadow:0 0 50px rgba(255,190,60,.9),0 0 60px rgba(255,190,60,.6) inset}
+#winWave.go{animation:winw .85s ease-out}
+@keyframes winw{0%{opacity:1;transform:scale(.3)}100%{opacity:0;transform:scale(11)}}
+
+/* 敗退：暗紅壓幕 + 灰化 + 重震 */
+#defeat{position:absolute;inset:0;z-index:41;opacity:0;pointer-events:none;background:
+  radial-gradient(120% 80% at 50% 44%,rgba(120,16,16,.3) 0%,rgba(12,6,6,.9) 76%)}
+#defeat.go{animation:dfin 1.7s ease-out}
+@keyframes dfin{0%{opacity:0}10%{opacity:1}66%{opacity:.92}100%{opacity:0}}
+#hero.dark img{filter:brightness(.42) saturate(.35) drop-shadow(0 22px 34px rgba(0,0,0,.9))}
+#hero.dark{transform:translateX(-50%) rotate(-2.6deg) translateY(12px);transition:transform .5s ease}
+.slash.grey{background:linear-gradient(90deg,transparent,#cfcac4,#8d8781,transparent);
+  filter:blur(1px) drop-shadow(0 0 14px rgba(160,150,140,.8))}
+#stage.shakeHard{animation:shkh .62s linear}
+@keyframes shkh{0%,100%{margin-left:0;margin-top:0}
+  10%{margin-left:-22px;margin-top:12px}25%{margin-left:20px;margin-top:-14px}
+  42%{margin-left:-16px;margin-top:10px}60%{margin-left:13px;margin-top:-8px}
+  78%{margin-left:-8px;margin-top:5px}90%{margin-left:4px;margin-top:-3px}}
+#vsTag.lose{color:#d8d2cb;text-shadow:0 0 26px rgba(90,90,100,.9),0 6px 0 #2b2622}
+
 .spark{position:absolute;width:14px;height:14px;border-radius:50%;
   background:radial-gradient(circle at 35% 30%,#fff8dc,#ffc63c 55%,#e08a10 100%);
   box-shadow:0 0 16px rgba(255,190,60,.95);pointer-events:none}
@@ -287,6 +374,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
   <div id="bg"></div>
   <div id="vig"></div>
 
+  <div id="halo"></div>
+  <div id="motes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
   <div id="aura"></div>
   <div id="hero"><img src="{{HERO}}" alt="關羽"></div>
   <div id="burst"></div>
@@ -301,7 +390,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
     <div class="txt">點我催糧！</div>
   </div>
 
-  <div id="combo"><b class="n" id="comboN">0</b><span class="l">COMBO</span></div>
+  <div id="combo"><b class="n" id="comboN">0</b><span class="l">COMBO</span><span class="crit">爆 擊</span></div>
 
   <div id="hud">
     <div class="row">
@@ -332,7 +421,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
   </div>
 
   <div id="bottom">
-    <div id="tapHint">▲ 連點關羽衝 COMBO，庫銀跳更快</div>
+    <div id="tapHint">▲ 連點關羽衝 COMBO，滿 30 觸發爆擊</div>
+    <div id="bldrow">
+      <button class="bld" id="bForge"><span class="lv" id="lvForge">Lv.0</span>
+        <span class="nm">鍛造坊</span><span class="ef" id="efForge">+14 /秒</span><span class="pr" id="prForge">200 金</span></button>
+      <button class="bld" id="bMarket"><span class="lv" id="lvMarket">Lv.0</span>
+        <span class="nm">市 集</span><span class="ef" id="efMarket">+30 /秒</span><span class="pr" id="prMarket">450 金</span></button>
+      <button class="bld" id="bCamp"><span class="lv" id="lvCamp">Lv.0</span>
+        <span class="nm">軍 營</span><span class="ef" id="efCamp">+60 /秒</span><span class="pr" id="prCamp">900 金</span></button>
+    </div>
     <div id="subrow">
       <button class="sub" id="defBtn">
         <span class="t">守 城</span><span class="s">徵繳城中稅賦</span>
@@ -352,11 +449,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
     <div id="flash"></div>
     <div id="goldFlash"></div>
     <div id="rays"></div>
+    <div id="winWave"></div>
     <div id="shield"></div>
     <div id="vsTag">殺！</div>
   </div>
 
   <div id="lvbanner"><div class="big" id="lvbBig">晉升官階 Lv.2</div><div class="small" id="lvbSmall">庫銀增速 ×1.6</div></div>
+
+  <div id="defeat"></div>
 
   <div id="result"></div>
 
@@ -415,6 +515,7 @@ var LINES={
   upgrade:['刀鋒既礪，聚糧更速，戰力亦增！','甲堅兵利，此後收金更快。','某又添一分本事，府庫進帳更豐。'],
   poor:['主公，府庫空虛，難以點兵，且待糧至。','無糧不成軍，還請主公稍候。'],
   levelup:['某已受封晉階！自此糧秣倍收，兵馬更盛。','蒙主公拔擢，關某願以此身，報效霸業。'],
+  crit:['刀已飲血，勢不可擋！','某這一刀，天地皆震！','主公且看——此乃萬人敵！'],
   end:['主公，霸業當前，可願與關某同往？']
 };
 function pick(a){return a[Math.floor(Math.random()*a.length)]}
@@ -447,18 +548,29 @@ var G={
   combo:0,          // 連點數
   comboT:0,         // 最後一次點擊時間
   buff:1,           // combo 帶來的產金倍率
+  critSaid:false,   // 爆擊台詞只講一次
   busy:false,
   over:false,
   defCool:0
 };
 var RATE_MUL=1.7, MAX_LEVEL=5, MAX_BATTLES=30, DEF_CD=6;
 var GOLD_GOAL=30000;      // 軍資達標 → 彈出廣告頁
-var MAX_TIME=75;          // 保險：最長 75 秒也會進廣告頁（都不操作時）
+var MAX_TIME=90;          // 保險：最長 90 秒也會進廣告頁（只出戰不蓋建築約需 77 秒，不能切在達標前）
 var COMBO_WINDOW=1600;    // 連點判定時間（毫秒）
 var COMBO_CAP=30;         // combo 加成上限（×4.6 產金 / ×6.4 單點）
 var WIN_MUL=4.0;          // 勝仗繳獲 = 出兵成本 ×
 var DEF_MUL=14;           // 守城稅賦 = 每秒產量 ×
 var startT=Date.now();
+
+/* 可購買建築：買了就永久提高庫銀增速 */
+var BLD=[
+  {k:'Forge', name:'鍛造坊', lv:0, cost:200, gain:14, mul:1.9, pw:220,
+   lines:['刀甲有處可修，軍威自壯。','鍛爐既起，兵刃日利。']},
+  {k:'Market',name:'市 集', lv:0, cost:450, gain:30, mul:1.9, pw:160,
+   lines:['商旅既通，錢糧滾滾而來。','市集一開，四方財貨自聚。']},
+  {k:'Camp',  name:'軍 營', lv:0, cost:900, gain:60, mul:1.9, pw:520,
+   lines:['營寨立定，兵源不絕。','三軍有所歸，戰力倍增。']}
+];
 
 var $=function(id){return document.getElementById(id)};
 var elGold=$('gold'), elRate=$('rate'), elLv=$('lvNum'), elXp=$('xpfill'),
@@ -467,6 +579,33 @@ var elGold=$('gold'), elRate=$('rate'), elLv=$('lvNum'), elXp=$('xpfill'),
     defBtn=$('defBtn'), upBtn=$('upBtn');
 
 function nf(n){return Math.floor(n).toLocaleString('en-US')}
+
+function renderBld(){
+  for(var i=0;i<BLD.length;i++){
+    var b=BLD[i];
+    $('lv'+b.k).textContent='Lv.'+b.lv;
+    $('ef'+b.k).textContent='+'+nf(b.gain)+' /秒';
+    $('pr'+b.k).textContent=nf(b.cost)+' 金';
+    var el=$('b'+b.k), afford=G.gold>=b.cost&&!G.busy;
+    el.classList.toggle('dim',!afford);
+    el.classList.toggle('ready',afford);
+  }
+}
+function buyBld(i){
+  if(G.busy||G.over) return;
+  var b=BLD[i];
+  if(G.gold<b.cost){ say(pick(LINES.poor)); centerFloat('庫銀不足！',true); return }
+  G.gold-=b.cost; b.lv++;
+  G.rate+=b.gain;                 // 直接加在每秒產量上，之後晉階 ×1.7 會一起放大
+  G.power+=b.pw;
+  b.cost=Math.round(b.cost*b.mul);
+  b.gain=Math.round(b.gain*1.15); // 下一級蓋出來效果更好
+  centerFloat(b.name.replace(/ /g,'')+' Lv.'+b.lv+' ‧ 每秒 '+nf(G.rate));
+  say(pick(b.lines));
+  $('b'+b.k).classList.remove('ready'); void $('b'+b.k).offsetWidth;
+  render();
+}
+
 function cost(){return Math.round(100*Math.pow(1.7,G.level-1))}
 function refineCost(){return Math.round(100*Math.pow(1.55,G.refine))}
 
@@ -480,8 +619,14 @@ function renderGoal(){
   elGoal.textContent='軍資 '+nf(G.gold)+' / '+nf(GOLD_GOAL);
   elXp.style.width=Math.min(100,G.gold/GOLD_GOAL*100)+'%';
 }
+function renderGlow(){
+  var g=Math.min(1,G.gold/GOLD_GOAL), p=Math.min(1,G.power/24000);
+  var t=Math.min(1,Math.pow(g*0.7+p*0.3,0.7));
+  stage.style.setProperty('--glow',t.toFixed(3));
+}
 function render(){
   elGold.textContent=nf(G.gold);
+  renderGlow();
   renderRate(); renderGoal();
   elLv.textContent=G.level;
   elXpTxt.textContent=(G.level>=MAX_LEVEL)?'滿階':(G.xp+' / '+G.need);
@@ -491,7 +636,11 @@ function render(){
   btn.classList.toggle('dim', G.gold<cost()||G.busy);
   upBtn.classList.toggle('dim', G.gold<refineCost()||G.busy);
   upBtn.classList.toggle('ready', G.gold>=refineCost()&&!G.busy);
+  renderBld();
 }
+
+/* ---- 建築按鈕綁定 ---- */
+BLD.forEach(function(b,i){ $('b'+b.k).addEventListener('click',function(){ buyBld(i) }) });
 
 /* ---- 庫銀自動累積 ---- */
 var last=Date.now();
@@ -500,10 +649,11 @@ setInterval(function(){
   var now=Date.now(), dt=(now-last)/1000; last=now;
   G.gold+=effRate()*dt;
   elGold.textContent=nf(G.gold);
-  renderGoal();
+  renderGoal(); renderGlow();
   btn.classList.toggle('dim', G.gold<cost()||G.busy);
   upBtn.classList.toggle('dim', G.gold<refineCost()||G.busy);
   upBtn.classList.toggle('ready', G.gold>=refineCost()&&!G.busy);
+  renderBld();
   if(G.gold>=GOLD_GOAL) endCard();          // 軍資達標 → 廣告頁
   else if((Date.now()-startT)/1000>=MAX_TIME) endCard();   // 保險：時間到也進廣告頁
 },100);
@@ -514,6 +664,7 @@ setInterval(function(){
   if(Date.now()-G.comboT>COMBO_WINDOW){
     G.combo=0; G.buff=1;
     $('combo').classList.remove('on');
+    $('combo').classList.remove('max');
     renderRate();
   }
 },120);
@@ -528,14 +679,14 @@ setInterval(function(){
 },1000);
 
 /* ---- 飄字 ---- */
-function floatText(txt,x,y,neg,small){
+function floatText(txt,x,y,cls){
   var d=document.createElement('div');
-  d.className='float'+(neg?' red':'')+(small?' small':''); d.textContent=txt;
+  d.className='float'+(cls?' '+cls:''); d.textContent=txt;
   d.style.left=x+'px'; d.style.top=y+'px';
   stage.appendChild(d);
   setTimeout(function(){d.remove()},1000);
 }
-function centerFloat(txt,neg){ floatText(txt,360,540,neg,txt.length>7) }
+function centerFloat(txt,neg){ floatText(txt,360,540,(neg?'red ':'')+(txt.length>7?'small':'')) }
 
 /* ---- 點擊關羽催糧 ---- */
 hero.addEventListener('pointerdown',function(e){
@@ -549,6 +700,8 @@ hero.addEventListener('pointerdown',function(e){
   var c=Math.min(G.combo,COMBO_CAP);
   G.buff = 1 + c*0.12;                          // 產金速度最高 ×4.6
   var gain = Math.round(G.tap*(1 + c*0.18));    // 單次點擊最高 ×6.4
+  var crit = G.combo>=COMBO_CAP;                // 滿 30 連 → 爆擊
+  if(crit) gain = Math.round(gain*2);           // 爆擊再翻倍
 
   G.gold+=gain;
   hero.classList.remove('hit'); void hero.offsetWidth; hero.classList.add('hit');
@@ -557,12 +710,18 @@ hero.addEventListener('pointerdown',function(e){
   if(G.combo>=2){
     $('comboN').textContent=G.combo;
     cb.classList.add('on');
+    cb.classList.toggle('max',crit);
     cb.classList.remove('pop'); void cb.offsetWidth; cb.classList.add('pop');
   }
 
   var r=stage.getBoundingClientRect(), sc=r.width/STAGE_W;
-  floatText('+'+nf(gain),(e.clientX-r.left)/sc,(e.clientY-r.top)/sc);
-  if(Math.random()<.22) say(pick(LINES.tap));
+  floatText((crit?'爆擊 +':'+')+nf(gain),(e.clientX-r.left)/sc,(e.clientY-r.top)/sc,crit?'crit':'');
+  if(crit){
+    hero.style.transition='filter .12s';
+    hero.style.filter='brightness(1.45) drop-shadow(0 0 40px #ffb03c)';
+    setTimeout(function(){hero.style.filter=''},130);
+    if(!G.critSaid){ G.critSaid=true; say(pick(LINES.crit),true); }
+  } else if(Math.random()<.22) say(pick(LINES.tap));
   render();
 });
 
@@ -603,7 +762,8 @@ btn.addEventListener('click',function(){
   render();
 
   goldBurst();
-  $('vsTag').classList.remove('go'); void $('vsTag').offsetWidth; $('vsTag').classList.add('go');
+  var vt=$('vsTag'); vt.textContent='殺！'; vt.classList.remove('lose');
+  vt.classList.remove('go'); void vt.offsetWidth; vt.classList.add('go');
   stage.classList.remove('shake'); void stage.offsetWidth; stage.classList.add('shake');
   for(var i=0;i<3;i++) addSlash(i*130);
 
@@ -642,6 +802,50 @@ function addSlash(delay){
   },delay);
 }
 
+/* 大勝：金幣從中心炸開後落下 */
+function coinRain(){
+  var wv=$('winWave'); wv.classList.remove('go'); void wv.offsetWidth; wv.classList.add('go');
+  if(!Element.prototype.animate) return;
+  var cx=360, cy=520;
+  for(var i=0;i<30;i++){
+    var c=document.createElement('div'); c.className='gcoin'; c.textContent='金';
+    var sz=30+Math.random()*22;
+    c.style.width=c.style.height=sz+'px'; c.style.fontSize=(sz*0.55)+'px';
+    c.style.left=cx+'px'; c.style.top=cy+'px';
+    $('fx').appendChild(c);
+    var ang=-Math.PI/2 + (Math.random()-0.5)*2.3,
+        pow=260+Math.random()*300,
+        dx=Math.cos(ang)*pow, dy=Math.sin(ang)*pow,
+        fall=520+Math.random()*320,
+        dur=900+Math.random()*520,
+        spin=(Math.random()<.5?-1:1)*(360+Math.random()*540);
+    try{
+      c.animate([
+        {transform:'translate(-50%,-50%) scale(.35) rotate(0deg)',opacity:1,offset:0},
+        {transform:'translate(calc(-50% + '+dx+'px),calc(-50% + '+dy+'px)) scale(1) rotate('+(spin*0.45)+'deg)',opacity:1,offset:0.34},
+        {transform:'translate(calc(-50% + '+dx*1.25+'px),calc(-50% + '+(dy+fall)+'px)) scale(.9) rotate('+spin+'deg)',opacity:0,offset:1}
+      ],{duration:dur,easing:'cubic-bezier(.25,.5,.4,1)'});
+    }catch(e){}
+    setTimeout(function(el){return function(){el.remove()}}(c),dur+80);
+  }
+}
+
+/* 敗退：暗紅壓幕 + 關羽垂首 + 灰刀光 + 重震 */
+function defeatFx(){
+  var d=$('defeat'); d.classList.remove('go'); void d.offsetWidth; d.classList.add('go');
+  stage.classList.remove('shakeHard'); void stage.offsetWidth; stage.classList.add('shakeHard');
+  hero.classList.add('dark');
+  setTimeout(function(){ hero.classList.remove('dark') },1500);
+  var t=$('vsTag'); t.textContent='敗'; t.classList.add('lose');
+  t.classList.remove('go'); void t.offsetWidth; t.classList.add('go');
+  for(var i=0;i<2;i++) (function(k){ setTimeout(function(){
+    var sl=document.createElement('div'); sl.className='slash grey';
+    sl.style.top=(40+Math.random()*20)+'%';
+    $('fx').appendChild(sl);
+    setTimeout(function(){sl.remove()},480);
+  },k*150) })(i);
+}
+
 function judge(){
   // 前兩場必勝；之後留敗場製造張力，但不連敗，節奏才不會卡
   var win = (G.battles<=2) ? true : (G.lastLose ? true : Math.random()>0.28);
@@ -649,11 +853,13 @@ function judge(){
   if(win){
     var g=Math.round(cost()*WIN_MUL), p=Math.round(200*G.level);
     G.gold+=g; G.power+=p; G.xp++;
-    showResult(true,g,p);
+    coinRain();
+    setTimeout(function(){ showResult(true,g,p) },620);   // 先看爆金幣，再跳面板
   }else{
     var g2=Math.round(cost()*.35);
     G.gold+=g2; G.power+=50;
-    showResult(false,g2,50);
+    defeatFx();
+    setTimeout(function(){ showResult(false,g2,50) },780); // 先看敗退演出
   }
   render();
 }
@@ -711,10 +917,21 @@ function endCard(){
   G.over=true;
   clearInterval(typing); clearTimeout(idleTimer);
   $('combo').classList.remove('on');
+  $('combo').classList.remove('max');
   $('end').classList.add('on');
 }
 $('end').addEventListener('click',clickThrough);
 $('cta').addEventListener('click',function(e){e.stopPropagation();clickThrough()});
+
+// 金塵：位置與時間錯開，避免同步升起
+(function(){
+  var ms=document.querySelectorAll('#motes i');
+  for(var i=0;i<ms.length;i++){
+    ms[i].style.left=(6+i*12+(i%3)*5)+'%';
+    ms[i].style.animationDelay=(i*0.52)+'s';
+    ms[i].style.animationDuration=(3.6+(i%4)*0.5)+'s';
+  }
+})();
 
 render();
 say(LINES.idle[0]);
