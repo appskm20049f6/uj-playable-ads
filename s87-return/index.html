@@ -663,21 +663,48 @@ function nodeLoop(){
   if(G.phase!=='counsel' && $('nodes').children.length<3) spawnNode();
   setTimeout(nodeLoop,900+Math.random()*700);
 }
-/* 節點不能生在工地（含名稱與成本標）上，也不能疊在已生成的節點上 */
+/* UI 禁區：節點的 z-index 低於 HUD/Logo/側邊鈕/底部導覽，生在這些位置會被蓋住而點不到，
+   所以生成時整塊排除。座標為舞台座標（720×1280）。 */
+var UI_BLOCKS=[
+  {x1:0,   y1:0,   x2:720, y2:212},   // 頂部資源列 + 階段列 + 進度條
+  {x1:0,   y1:168, x2:178, y2:292},   // 左上 Logo
+  {x1:608, y1:188, x2:720, y2:472},   // 右側三顆圓鈕
+  {x1:0,   y1:820, x2:720, y2:1280}   // 對話框 / 出征鈕 / 名將列 / 底部導覽
+];
+/* 節點佔位：對 UI 用完整範圍（含上方獎勵標籤與外圈光暈），
+   對工地只用圖示核心——光暈輕微交疊沒關係，重點是不要壓到名稱與成本標。 */
+function nodeBox(x,y){ return {x1:x-66,y1:y-84,x2:x+66,y2:y+66} }
+function nodeCore(x,y){ return {x1:x-48,y1:y-72,x2:x+48,y2:y+48} }
+function hit(a,b){ return !(a.x2<=b.x1||b.x2<=a.x1||a.y2<=b.y1||b.y2<=a.y1) }
+/* 工地的實際佔位：方形牌位 + 下方名稱與成本標兩行 */
+function spotBoxes(b){ return [
+  {x1:b.x-64,y1:b.y-64,x2:b.x+64,y2:b.y+64},      // 牌位
+  {x1:b.x-82,y1:b.y+54,x2:b.x+82,y2:b.y+120}      // 名稱 + 成本標
+] }
+
+/* 兩段式取位：
+   前 40 次同時避開工地牌位與下方的名稱／成本標（最理想）；
+   後 20 次只避開牌位——六個工地的 x 幾乎橫向鋪滿，若標籤也一律避開，
+   右側整片會取不到位置，開場最需要資源時反而不出節點。
+   UI 禁區（HUD／Logo／側邊鈕／底部）在兩段都是硬性排除。 */
 function pickNodePos(){
-  for(var tries=0;tries<40;tries++){
-    var x=95+Math.random()*530, y=265+Math.random()*505, ok=true;
-    for(var i=0;i<BUILDINGS.length;i++){
-      var b=BUILDINGS[i], d=$('spots').querySelector('.spot[data-i="'+i+'"]');
+  for(var tries=0;tries<60;tries++){
+    var strict = tries<40;
+    var x=96+Math.random()*528, y=282+Math.random()*490, ok=true;
+    var box=nodeBox(x,y), core=nodeCore(x,y);
+    for(var u=0;u<UI_BLOCKS.length;u++){ if(hit(box,UI_BLOCKS[u])){ ok=false; break } }
+    if(ok) for(var i=0;i<BUILDINGS.length&&ok;i++){
+      var d=$('spots').querySelector('.spot[data-i="'+i+'"]');
       if(d&&d.classList.contains('done')) continue;
-      // 工地本體 + 下方名稱與成本標一併避開
-      if(Math.abs(x-b.x)<170 && y>b.y-110 && y<b.y+160){ ok=false; break }
+      var sb=spotBoxes(BUILDINGS[i]);
+      var lim=strict?sb.length:1;                 // 寬鬆時只比對牌位
+      for(var m=0;m<lim;m++){ if(hit(core,sb[m])){ ok=false; break } }
     }
     if(ok){
-      var ns=$('nodes').children;
+      var ns=$('nodes').children, gap=strict?118:96;
       for(var j=0;j<ns.length;j++){
         var nx=parseFloat(ns[j].style.left), ny=parseFloat(ns[j].style.top);
-        if(Math.abs(x-nx)<125&&Math.abs(y-ny)<125){ ok=false; break }
+        if(Math.abs(x-nx)<gap&&Math.abs(y-ny)<gap){ ok=false; break }
       }
     }
     if(ok) return {x:x,y:y};
