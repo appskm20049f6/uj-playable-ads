@@ -85,10 +85,41 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
   filter:blur(2px);animation:pulse 2.4s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:.5;transform:translateX(-50%) scale(.95)}50%{opacity:1;transform:translateX(-50%) scale(1.08)}}
 
+/* 開場點擊引導 */
+#tapGuide{position:absolute;left:50%;bottom:498px;transform:translateX(-50%);
+  z-index:19;pointer-events:none;text-align:center}
+#tapGuide.hide{display:none}
+#tapGuide .rings{position:relative;width:150px;height:150px;margin:0 auto}
+#tapGuide .rings i{position:absolute;inset:0;border-radius:50%;
+  border:5px solid rgba(255,214,110,.95);box-shadow:0 0 26px rgba(255,190,60,.85);
+  animation:tapring 1.5s ease-out infinite}
+#tapGuide .rings i:nth-child(2){animation-delay:.5s}
+#tapGuide .rings i:nth-child(3){animation-delay:1s}
+@keyframes tapring{0%{transform:scale(.42);opacity:1}100%{transform:scale(1.1);opacity:0}}
+#tapGuide .hand{position:absolute;left:50%;top:50%;width:78px;margin:-30px 0 0 -30px;
+  filter:drop-shadow(0 4px 10px rgba(0,0,0,.85));animation:tapping 1.1s ease-in-out infinite}
+@keyframes tapping{0%,100%{transform:translate(0,0) scale(1)}
+  45%{transform:translate(-8px,-20px) scale(.9)}}
+#tapGuide .txt{margin-top:14px;font-size:34px;font-weight:900;color:#ffe9a8;letter-spacing:4px;
+  text-shadow:0 3px 0 #7a3c06,0 0 22px rgba(255,190,60,.9);animation:blink 1.2s ease-in-out infinite}
+
+/* COMBO */
+#combo{position:absolute;right:32px;bottom:496px;z-index:19;text-align:right;
+  pointer-events:none;opacity:0;transition:opacity .18s}
+#combo.on{opacity:1}
+#combo .n{display:block;font-size:82px;font-weight:900;color:#fff;line-height:.92;
+  text-shadow:0 4px 0 #a2540a,0 0 34px rgba(255,190,60,.95)}
+#combo .l{display:block;font-size:25px;font-weight:900;color:#ffd166;letter-spacing:5px;
+  text-shadow:0 2px 4px #000}
+#combo.pop .n{animation:cpop .2s ease}
+@keyframes cpop{0%{transform:scale(1)}45%{transform:scale(1.3)}100%{transform:scale(1)}}
+#rate.hot{color:#ffd166;text-shadow:0 1px 3px #000,0 0 18px rgba(255,190,60,.9)}
+
 /* 飄字 */
 .float{position:absolute;z-index:30;font-size:40px;font-weight:900;color:#ffe27a;
-  text-shadow:0 2px 0 #6b3d06,0 0 14px rgba(255,190,60,.8);pointer-events:none;
-  animation:fly 1s ease-out forwards}
+  white-space:nowrap;text-shadow:0 2px 0 #6b3d06,0 0 14px rgba(255,190,60,.8);
+  pointer-events:none;animation:fly 1s ease-out forwards}
+.float.small{font-size:31px}
 @keyframes fly{0%{opacity:0;transform:translate(-50%,0) scale(.7)}
   18%{opacity:1;transform:translate(-50%,-24px) scale(1.15)}
   100%{opacity:0;transform:translate(-50%,-150px) scale(1)}}
@@ -110,6 +141,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
   text-shadow:0 2px 0 #4a2205}
 .sub .s{display:block;font-size:20px;font-weight:700;color:#c9ad7c;margin-top:1px}
 .sub.dim{filter:grayscale(.6) brightness(.72)}
+/* 強化可負擔時的提醒光暈 + 小標籤 */
+#upBtn.ready{border-color:#ffd980;box-shadow:0 0 0 1px rgba(255,230,170,.3) inset,
+  0 8px 0 #2a1a08,0 12px 24px rgba(0,0,0,.6),0 0 26px rgba(255,190,60,.55);
+  animation:upglow 1.6s ease-in-out infinite}
+@keyframes upglow{0%,100%{box-shadow:0 0 0 1px rgba(255,230,170,.3) inset,0 8px 0 #2a1a08,0 12px 24px rgba(0,0,0,.6),0 0 18px rgba(255,190,60,.4)}
+  50%{box-shadow:0 0 0 1px rgba(255,230,170,.3) inset,0 8px 0 #2a1a08,0 12px 24px rgba(0,0,0,.6),0 0 34px rgba(255,190,60,.85)}}
+/* 強化副標把效果數字用金色點出來 */
+#upBtn .s b{color:#ffd166;font-weight:900}
 .sub .cd{position:absolute;inset:0;background:rgba(0,0,0,.62);
   display:none;align-items:center;justify-content:center;
   font-size:38px;font-weight:900;color:#ffd166}
@@ -141,7 +180,26 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
   30%{opacity:1}100%{opacity:0;transform:rotate(-24deg) translateX(30%) scaleX(1)}}
 #flash{position:absolute;inset:0;background:#fff;opacity:0}
 #flash.go{animation:fl .5s ease-out}
-@keyframes fl{0%{opacity:0}12%{opacity:.85}100%{opacity:0}}
+@keyframes fl{0%{opacity:0}12%{opacity:.55}100%{opacity:0}}
+/* 出戰金光：中心爆光 + 放射光芒 + 金屑 */
+#goldFlash{position:absolute;inset:0;opacity:0;background:
+  radial-gradient(58% 42% at 50% 46%,rgba(255,247,214,.98) 0%,rgba(255,206,86,.9) 24%,
+   rgba(255,150,26,.42) 52%,rgba(255,120,0,0) 76%)}
+#goldFlash.go{animation:gflash 1s ease-out}
+@keyframes gflash{0%{opacity:0;transform:scale(.55)}
+  13%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.22)}}
+#rays{position:absolute;left:50%;top:46%;width:1200px;height:1200px;margin:-600px 0 0 -600px;
+  opacity:0;background:repeating-conic-gradient(from 0deg,
+    rgba(255,232,160,.92) 0deg 3.5deg,rgba(255,232,160,0) 3.5deg 20deg);
+  -webkit-mask-image:radial-gradient(closest-side,rgba(0,0,0,.15) 8%,#000 34%,transparent 72%);
+  mask-image:radial-gradient(closest-side,rgba(0,0,0,.15) 8%,#000 34%,transparent 72%)}
+#rays.go{animation:raysin 1.05s ease-out}
+@keyframes raysin{0%{opacity:0;transform:scale(.35) rotate(0deg)}
+  16%{opacity:.95;transform:scale(1) rotate(14deg)}
+  100%{opacity:0;transform:scale(1.3) rotate(44deg)}}
+.spark{position:absolute;width:14px;height:14px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#fff8dc,#ffc63c 55%,#e08a10 100%);
+  box-shadow:0 0 16px rgba(255,190,60,.95);pointer-events:none}
 #shield{position:absolute;left:50%;top:52%;width:520px;height:520px;margin:-260px 0 0 -260px;
   border-radius:50%;border:8px solid rgba(140,220,255,.9);opacity:0;
   box-shadow:0 0 60px rgba(120,200,255,.8) inset,0 0 50px rgba(120,200,255,.7)}
@@ -233,6 +291,18 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
   <div id="hero"><img src="{{HERO}}" alt="關羽"></div>
   <div id="burst"></div>
 
+  <div id="tapGuide">
+    <div class="rings"><i></i><i></i><i></i>
+      <svg class="hand" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <path d="M26 6c3 0 5 2.4 5 5.4V30l4.4-3.6c2.4-2 5.8-1.7 7.7.6l.4.5 6.6 8.6c1.6 2 2.4 4.6 2.4 7.2v5.4c0 5-4 9.3-9 9.3H31c-3.4 0-6.6-1.7-8.5-4.6L11 36.6c-1.6-2.5-.9-5.8 1.6-7.4 2.2-1.4 5-1 6.8.8L21 31.6V11.4C21 8.4 23 6 26 6z"
+          fill="#fff8e2" stroke="#7a3c06" stroke-width="3" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="txt">點我催糧！</div>
+  </div>
+
+  <div id="combo"><b class="n" id="comboN">0</b><span class="l">COMBO</span></div>
+
   <div id="hud">
     <div class="row">
       <div class="coinbox">
@@ -245,7 +315,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
       <div class="lvbox"><b id="lvNum">1</b><i>官階</i></div>
     </div>
     <div id="xpwrap">
-      <div class="xplabel"><span>戰功 <span id="xpTxt">0 / 2</span></span><span class="pw" id="power">戰力 1,200</span></div>
+      <div class="xplabel">
+        <span>戰功 <span id="xpTxt">0 / 2</span> ‧ <span class="pw" id="power">戰力 1,200</span></span>
+        <span id="goalTxt">軍資 80 / 30,000</span>
+      </div>
       <div id="xpbar"><div id="xpfill"></div></div>
     </div>
   </div>
@@ -259,14 +332,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
   </div>
 
   <div id="bottom">
-    <div id="tapHint">▲ 點擊關羽，可催糧增金</div>
+    <div id="tapHint">▲ 連點關羽衝 COMBO，庫銀跳更快</div>
     <div id="subrow">
       <button class="sub" id="defBtn">
         <span class="t">守 城</span><span class="s">徵繳城中稅賦</span>
         <span class="cd" id="defCd">6</span>
       </button>
       <button class="sub" id="upBtn">
-        <span class="t">強 化</span><span class="s" id="upSub">礪刀 ‧ 100 金</span>
+        <span class="t">強 化</span><span class="s" id="upSub"><b>收金 +12%</b> ‧ 100 金</span>
       </button>
     </div>
     <button id="fightBtn">
@@ -277,6 +350,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
 
   <div id="fx">
     <div id="flash"></div>
+    <div id="goldFlash"></div>
+    <div id="rays"></div>
     <div id="shield"></div>
     <div id="vsTag">殺！</div>
   </div>
@@ -310,7 +385,7 @@ function fit(){
 addEventListener('resize',fit); addEventListener('orientationchange',fit); fit();
 
 /* ================= 廣告 CTA（Meta / Google / IronSource / 通用） ================= */
-var STORE_URL='https://sanguo.uj.com.tw/';
+var STORE_URL='https://play.google.com/store/apps/details?id=com.userjoy.rte&hl=zh_TW';
 function clickThrough(){
   try{ if(window.FbPlayableAd&&FbPlayableAd.onCTAClick){FbPlayableAd.onCTAClick();return;} }catch(e){}
   try{ if(window.ExitApi&&ExitApi.exit){ExitApi.exit();return;} }catch(e){}
@@ -337,7 +412,7 @@ var LINES={
   win:['敵將已斬，此城歸主公矣！','旗開得勝，賊眾望風而潰。','某不辱命，洛陽指日可待。'],
   lose:['勝敗乃兵家常事，容某整軍再戰。','敵眾我寡，暫且退兵，另尋良機。','此戰失利，罪在關某，願再領兵。'],
   defend:['城門固若金湯，賊眾自退。','稅賦已入府庫，盡歸主公。','某已巡城一周，四門無虞。'],
-  upgrade:['刀鋒既礪，戰力倍增！','甲堅兵利，此去必勝。','某又添一分本事，主公放心。'],
+  upgrade:['刀鋒既礪，聚糧更速，戰力亦增！','甲堅兵利，此後收金更快。','某又添一分本事，府庫進帳更豐。'],
   poor:['主公，府庫空虛，難以點兵，且待糧至。','無糧不成軍，還請主公稍候。'],
   levelup:['某已受封晉階！自此糧秣倍收，兵馬更盛。','蒙主公拔擢，關某願以此身，報效霸業。'],
   end:['主公，霸業當前，可願與關某同往？']
@@ -359,9 +434,9 @@ function say(txt,holdIdle){
 
 /* ================= 遊戲狀態 ================= */
 var G={
-  gold:80,          // 起始庫銀，開場幾乎不用等就能出戰
-  rate:12,          // 庫銀/秒
-  tap:15,           // 點擊獲得
+  gold:100,         // 起始庫銀，開場幾乎不用等就能出戰
+  rate:14,          // 庫銀/秒
+  tap:22,           // 點擊獲得
   level:1,
   xp:0,
   need:2,           // 每級所需戰功（勝場）
@@ -369,15 +444,25 @@ var G={
   lastLose:false,
   power:1200,
   refine:0,         // 強化次數
+  combo:0,          // 連點數
+  comboT:0,         // 最後一次點擊時間
+  buff:1,           // combo 帶來的產金倍率
   busy:false,
   over:false,
   defCool:0
 };
-var RATE_MUL=1.6, MAX_LEVEL=4, MAX_BATTLES=12, DEF_CD=6;
+var RATE_MUL=1.7, MAX_LEVEL=5, MAX_BATTLES=30, DEF_CD=6;
+var GOLD_GOAL=30000;      // 軍資達標 → 彈出廣告頁
+var MAX_TIME=75;          // 保險：最長 75 秒也會進廣告頁（都不操作時）
+var COMBO_WINDOW=1600;    // 連點判定時間（毫秒）
+var COMBO_CAP=30;         // combo 加成上限（×4.6 產金 / ×6.4 單點）
+var WIN_MUL=4.0;          // 勝仗繳獲 = 出兵成本 ×
+var DEF_MUL=14;           // 守城稅賦 = 每秒產量 ×
+var startT=Date.now();
 
 var $=function(id){return document.getElementById(id)};
 var elGold=$('gold'), elRate=$('rate'), elLv=$('lvNum'), elXp=$('xpfill'),
-    elXpTxt=$('xpTxt'), elCost=$('costTxt'), elPower=$('power'),
+    elXpTxt=$('xpTxt'), elCost=$('costTxt'), elPower=$('power'), elGoal=$('goalTxt'),
     btn=$('fightBtn'), hero=$('hero'), result=$('result'),
     defBtn=$('defBtn'), upBtn=$('upBtn');
 
@@ -385,17 +470,27 @@ function nf(n){return Math.floor(n).toLocaleString('en-US')}
 function cost(){return Math.round(100*Math.pow(1.7,G.level-1))}
 function refineCost(){return Math.round(100*Math.pow(1.55,G.refine))}
 
+function effRate(){ return G.rate*G.buff }
+function renderRate(){
+  var hot=G.buff>1.001;
+  elRate.textContent='庫銀 +'+nf(effRate())+' / 秒'+(hot?' ×'+G.buff.toFixed(1):'');
+  elRate.classList.toggle('hot',hot);
+}
+function renderGoal(){
+  elGoal.textContent='軍資 '+nf(G.gold)+' / '+nf(GOLD_GOAL);
+  elXp.style.width=Math.min(100,G.gold/GOLD_GOAL*100)+'%';
+}
 function render(){
   elGold.textContent=nf(G.gold);
-  elRate.textContent='庫銀 +'+nf(G.rate)+' / 秒';
+  renderRate(); renderGoal();
   elLv.textContent=G.level;
-  elXpTxt.textContent=G.xp+' / '+G.need;
-  elXp.style.width=Math.min(100,G.xp/G.need*100)+'%';
+  elXpTxt.textContent=(G.level>=MAX_LEVEL)?'滿階':(G.xp+' / '+G.need);
   elPower.textContent='戰力 '+nf(G.power);
   elCost.textContent='點兵 '+nf(cost())+' 金 ‧ 引軍取洛陽';
-  $('upSub').textContent='礪刀 ‧ '+nf(refineCost())+' 金';
+  $('upSub').innerHTML='<b>收金 +12%</b> ‧ '+nf(refineCost())+' 金';
   btn.classList.toggle('dim', G.gold<cost()||G.busy);
   upBtn.classList.toggle('dim', G.gold<refineCost()||G.busy);
+  upBtn.classList.toggle('ready', G.gold>=refineCost()&&!G.busy);
 }
 
 /* ---- 庫銀自動累積 ---- */
@@ -403,11 +498,25 @@ var last=Date.now();
 setInterval(function(){
   if(G.over) return;
   var now=Date.now(), dt=(now-last)/1000; last=now;
-  G.gold+=G.rate*dt;
+  G.gold+=effRate()*dt;
   elGold.textContent=nf(G.gold);
+  renderGoal();
   btn.classList.toggle('dim', G.gold<cost()||G.busy);
   upBtn.classList.toggle('dim', G.gold<refineCost()||G.busy);
+  upBtn.classList.toggle('ready', G.gold>=refineCost()&&!G.busy);
+  if(G.gold>=GOLD_GOAL) endCard();          // 軍資達標 → 廣告頁
+  else if((Date.now()-startT)/1000>=MAX_TIME) endCard();   // 保險：時間到也進廣告頁
 },100);
+
+/* ---- combo 衰減：超過判定時間沒點就斷 ---- */
+setInterval(function(){
+  if(G.over||G.busy||G.combo===0) return;      // 戰鬥中凍結 combo，不因動畫斷連
+  if(Date.now()-G.comboT>COMBO_WINDOW){
+    G.combo=0; G.buff=1;
+    $('combo').classList.remove('on');
+    renderRate();
+  }
+},120);
 
 /* ---- 守城冷卻 ---- */
 setInterval(function(){
@@ -419,30 +528,48 @@ setInterval(function(){
 },1000);
 
 /* ---- 飄字 ---- */
-function floatText(txt,x,y,neg){
+function floatText(txt,x,y,neg,small){
   var d=document.createElement('div');
-  d.className='float'+(neg?' red':''); d.textContent=txt;
+  d.className='float'+(neg?' red':'')+(small?' small':''); d.textContent=txt;
   d.style.left=x+'px'; d.style.top=y+'px';
   stage.appendChild(d);
   setTimeout(function(){d.remove()},1000);
 }
-function centerFloat(txt,neg){ floatText(txt,360,540,neg) }
+function centerFloat(txt,neg){ floatText(txt,360,540,neg,txt.length>7) }
 
 /* ---- 點擊關羽催糧 ---- */
 hero.addEventListener('pointerdown',function(e){
   if(G.over) return;
-  G.gold+=G.tap;
+  $('tapGuide').classList.add('hide');          // 點過就收掉引導
+
+  // combo：時間內連點才累積
+  var now=Date.now();
+  G.combo = (now-G.comboT < COMBO_WINDOW) ? G.combo+1 : 1;
+  G.comboT = now;
+  var c=Math.min(G.combo,COMBO_CAP);
+  G.buff = 1 + c*0.12;                          // 產金速度最高 ×4.6
+  var gain = Math.round(G.tap*(1 + c*0.18));    // 單次點擊最高 ×6.4
+
+  G.gold+=gain;
   hero.classList.remove('hit'); void hero.offsetWidth; hero.classList.add('hit');
+
+  var cb=$('combo');
+  if(G.combo>=2){
+    $('comboN').textContent=G.combo;
+    cb.classList.add('on');
+    cb.classList.remove('pop'); void cb.offsetWidth; cb.classList.add('pop');
+  }
+
   var r=stage.getBoundingClientRect(), sc=r.width/STAGE_W;
-  floatText('+'+nf(G.tap),(e.clientX-r.left)/sc,(e.clientY-r.top)/sc);
-  if(Math.random()<.3) say(pick(LINES.tap));
+  floatText('+'+nf(gain),(e.clientX-r.left)/sc,(e.clientY-r.top)/sc);
+  if(Math.random()<.22) say(pick(LINES.tap));
   render();
 });
 
 /* ================= 守城：徵稅 + 加成 ================= */
 defBtn.addEventListener('click',function(){
   if(G.busy||G.over||G.defCool>0) return;
-  var g=Math.round(G.rate*8);
+  var g=Math.round(G.rate*DEF_MUL);
   G.gold+=g; G.power+=60;
   G.defCool=DEF_CD; defBtn.classList.add('cool'); $('defCd').textContent=DEF_CD;
   $('shield').classList.remove('go'); void $('shield').offsetWidth; $('shield').classList.add('go');
@@ -462,7 +589,7 @@ upBtn.addEventListener('click',function(){
   G.tap=Math.round(G.tap*1.12+1);
   hero.style.transition='filter .3s'; hero.style.filter='brightness(1.35) drop-shadow(0 0 30px #ffcf5a)';
   setTimeout(function(){hero.style.filter=''},380);
-  centerFloat('戰力提升！');
+  centerFloat('收金 +12% ‧ 每秒 '+nf(G.rate));
   say(pick(LINES.upgrade));
   render();
 });
@@ -475,13 +602,37 @@ btn.addEventListener('click',function(){
   say(pick(LINES.goFight),true);
   render();
 
-  $('flash').classList.remove('go'); void $('flash').offsetWidth; $('flash').classList.add('go');
+  goldBurst();
   $('vsTag').classList.remove('go'); void $('vsTag').offsetWidth; $('vsTag').classList.add('go');
   stage.classList.remove('shake'); void stage.offsetWidth; stage.classList.add('shake');
   for(var i=0;i<3;i++) addSlash(i*130);
 
   setTimeout(judge,900);
 });
+/* 出戰金光：中心爆光 + 放射光芒 + 金屑四散 */
+function goldBurst(){
+  ['flash','goldFlash','rays'].forEach(function(id){
+    var el=$(id); el.classList.remove('go'); void el.offsetWidth; el.classList.add('go');
+  });
+  var cx=360, cy=560;
+  if(!document.body.animate && !Element.prototype.animate) return;  // 舊 WebView：只留爆光與光芒
+  for(var i=0;i<18;i++){
+    var sp=document.createElement('div'); sp.className='spark';
+    var ang=(Math.PI*2/18)*i + Math.random()*0.3,
+        dist=200+Math.random()*260,
+        dur=520+Math.random()*380,
+        sz=9+Math.random()*14;
+    sp.style.width=sp.style.height=sz+'px';
+    sp.style.left=cx+'px'; sp.style.top=cy+'px';
+    $('fx').appendChild(sp);
+    try{ sp.animate([
+      {transform:'translate(-50%,-50%) scale(.3)',opacity:1},
+      {transform:'translate(calc(-50% + '+Math.cos(ang)*dist+'px),calc(-50% + '+Math.sin(ang)*dist+'px)) scale(1.15)',opacity:0}
+    ],{duration:dur,easing:'cubic-bezier(.2,.7,.3,1)'}); }catch(e){}
+    setTimeout(function(el){return function(){el.remove()}}(sp),dur+60);
+  }
+}
+
 function addSlash(delay){
   setTimeout(function(){
     var s=document.createElement('div'); s.className='slash';
@@ -496,7 +647,7 @@ function judge(){
   var win = (G.battles<=2) ? true : (G.lastLose ? true : Math.random()>0.28);
   G.lastLose = !win;
   if(win){
-    var g=Math.round(cost()*2.3), p=Math.round(200*G.level);
+    var g=Math.round(cost()*WIN_MUL), p=Math.round(200*G.level);
     G.gold+=g; G.power+=p; G.xp++;
     showResult(true,g,p);
   }else{
@@ -527,9 +678,10 @@ function showResult(win,g,p){
     if(done) return; done=true;
     result.classList.remove('on'); result.onclick=null;
     G.busy=false;
+    if(G.combo>0) G.comboT=Date.now();          // 接回 combo 計時
     if(lvup){ levelUp(); }
     else if(G.battles>=MAX_BATTLES){ render(); setTimeout(endCard,400); }
-    else { render(); say(pick(LINES.idle)); }
+    else { render(); if(!G.over) say(pick(LINES.idle)); }
   };
   setTimeout(function(){ if(!done&&result.classList.contains('on')) result.onclick(); },2300);
 }
@@ -550,14 +702,15 @@ function levelUp(){
   say(pick(LINES.levelup),true);
 
   render();
-  if(G.level>=MAX_LEVEL) setTimeout(endCard,2100);
-  else setTimeout(function(){ if(!G.over) say(pick(LINES.idle)) },2600);
+  setTimeout(function(){ if(!G.over) say(pick(LINES.idle)) },2600);
 }
 
 /* ================= 結束卡 ================= */
 function endCard(){
+  if(G.over) return;
   G.over=true;
   clearInterval(typing); clearTimeout(idleTimer);
+  $('combo').classList.remove('on');
   $('end').classList.add('on');
 }
 $('end').addEventListener('click',clickThrough);
