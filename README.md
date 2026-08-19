@@ -8,7 +8,9 @@
 |---|---|---|---|---|
 | [`s87-guanyu/`](s87-guanyu/) | 三國群英傳－霸王之業 ‧ S87 旁親明德（8/26 開服） | 放置掛機：庫銀累積 → 出戰／守城／強化 → 晉升官階加速 → 導預約 | 720×1280（9:16） | 1.18 MB |
 
-線上試玩：**https://<帳號>.github.io/uj-playable-ads/**（GitHub Pages，推上去後補上實際網址）
+線上試玩：**https://appskm20049f6.github.io/uj-playable-ads/**（GitHub Pages）
+
+- S87 關羽鎮城爭霸：https://appskm20049f6.github.io/uj-playable-ads/s87-guanyu/
 
 ## 每支廣告的資料夾結構
 
