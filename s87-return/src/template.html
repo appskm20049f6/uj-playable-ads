@@ -9,17 +9,15 @@
 html,body{width:100%;height:100%;overflow:hidden;background:#07060a;
   font-family:"Noto Serif TC","Microsoft JhengHei","PingFang TC",serif;
   user-select:none;-webkit-user-select:none;touch-action:manipulation}
-
-/* 素材只內嵌一份，其餘用 var() 引用，避免同一張圖被 base64 重複塞進檔案 */
-:root{--cityFull:url("{{CITY_FULL}}");--cityRuin:url("{{CITY_RUIN}}")}
+:root{--cityFull:url("{{CITY_FULL}}");--cityRuin:url("{{CITY_RUIN}}");
+  --gold:#d8a33d;--goldL:#ffe9a8;--panel:linear-gradient(180deg,rgba(30,22,12,.96),rgba(11,8,5,.97))}
 #stage{position:absolute;left:50%;top:50%;width:720px;height:1280px;
   transform-origin:50% 50%;overflow:hidden;background:#07060a}
 
-/* ---------- 城池：完好底 + 廢墟蒙層 ---------- */
+/* ================= 場景 ================= */
 #cityFull{position:absolute;inset:0;background:var(--cityFull) center/cover no-repeat}
 #cityRuin{position:absolute;inset:0;background:var(--cityRuin) center/cover no-repeat;
   opacity:1;transition:opacity 1.1s ease}
-/* 修復後恢復顏色的區塊：用完好圖對位 + 圓形遮罩 */
 .patch{position:absolute;width:360px;height:360px;opacity:0;
   background-image:var(--cityFull);background-size:720px 1280px;background-repeat:no-repeat;
   -webkit-mask-image:radial-gradient(closest-side,#000 52%,rgba(0,0,0,.35) 78%,transparent 100%);
@@ -29,35 +27,283 @@ html,body{width:100%;height:100%;overflow:hidden;background:#07060a;
 #dust{position:absolute;inset:0;pointer-events:none;opacity:1;transition:opacity 1.2s ease}
 #dust i{position:absolute;width:6px;height:6px;border-radius:50%;
   background:rgba(206,198,186,.5);animation:drift 9s linear infinite}
-@keyframes drift{0%{transform:translate(0,0);opacity:0}
-  15%{opacity:.8}100%{transform:translate(-40px,-320px);opacity:0}}
+@keyframes drift{0%{transform:translate(0,0);opacity:0}15%{opacity:.8}
+  100%{transform:translate(-40px,-320px);opacity:0}}
 #vig{position:absolute;inset:0;pointer-events:none;background:
-  radial-gradient(120% 66% at 50% 44%,rgba(0,0,0,0) 40%,rgba(0,0,0,.7) 100%),
-  linear-gradient(180deg,rgba(6,5,8,.92) 0%,rgba(6,5,8,.1) 20%,rgba(6,5,8,.22) 56%,rgba(6,5,8,.96) 100%)}
+  radial-gradient(120% 64% at 50% 48%,rgba(0,0,0,0) 42%,rgba(0,0,0,.62) 100%),
+  linear-gradient(180deg,rgba(6,5,8,.95) 0%,rgba(6,5,8,.14) 24%,rgba(6,5,8,.26) 60%,rgba(6,5,8,.96) 100%)}
 
-/* ---------- 頂部 HUD ---------- */
-#hud{position:absolute;top:0;left:0;right:0;padding:20px 26px 0;z-index:20;opacity:0;
+/* ================= 左右龍柱裝飾（仿遊戲邊框）================= */
+.pillar{position:absolute;top:118px;bottom:150px;width:16px;z-index:14;pointer-events:none;
+  background:linear-gradient(180deg,rgba(216,163,61,0),rgba(216,163,61,.55) 12%,
+    rgba(255,233,168,.75) 50%,rgba(216,163,61,.55) 88%,rgba(216,163,61,0));
+  box-shadow:0 0 14px rgba(255,190,60,.35)}
+.pillar.l{left:0;border-radius:0 8px 8px 0}
+.pillar.r{right:0;border-radius:8px 0 0 8px}
+
+/* ================= 頂部資源列 ================= */
+#top{position:absolute;top:0;left:0;right:0;z-index:24;padding:12px 14px 0;opacity:0;
   transition:opacity .5s ease}
-#hud.on{opacity:1}
-.hrow{display:flex;align-items:center;justify-content:space-between;gap:12px;
-  font-size:24px;font-weight:900;color:#f3e5c6;text-shadow:0 2px 5px rgba(0,0,0,.9);margin-bottom:7px}
-.hrow .r{color:#ffe9a8}
-#pbar{height:22px;border-radius:12px;background:rgba(0,0,0,.72);border:2px solid #a37b2c;
-  overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.6)}
-#pfill{height:100%;width:0%;border-radius:10px;transition:width .5s ease;
-  background:linear-gradient(90deg,#ffb63c,#ffe9a8 60%,#fff8dd);
-  box-shadow:0 0 18px rgba(255,190,70,.9)}
-#logoTop{position:absolute;top:86px;left:50%;transform:translateX(-50%);width:184px;z-index:20;
-  opacity:.9;filter:drop-shadow(0 4px 12px rgba(0,0,0,.9))}
+#top.on{opacity:1}
+#resRow{display:flex;gap:8px;align-items:stretch}
+.res{flex:1;display:flex;align-items:center;gap:7px;padding:7px 9px;border-radius:13px;
+  background:var(--panel);border:2px solid #a3762c;
+  box-shadow:0 0 0 1px rgba(255,230,170,.16) inset,0 6px 16px rgba(0,0,0,.65)}
+.res .ic{flex:0 0 38px;width:38px;height:38px;border-radius:10px;display:flex;
+  align-items:center;justify-content:center;font-size:23px;font-weight:900;color:#1b1207;
+  border:2px solid rgba(255,240,200,.55);text-shadow:0 1px 0 rgba(255,255,255,.4)}
+#resWood .ic{background:linear-gradient(180deg,#cfa96b,#7d5a24)}
+#resIron .ic{background:linear-gradient(180deg,#d5dee6,#798794)}
+#resTroop .ic{background:linear-gradient(180deg,#f09a8a,#a03026)}
+.res .col{flex:1;min-width:0}
+.res b{display:block;font-size:29px;font-weight:900;line-height:1.05;color:var(--goldL);
+  font-variant-numeric:tabular-nums;text-shadow:0 2px 0 #6b3d06}
+.res i{display:block;font-style:normal;font-size:16px;font-weight:700;color:#8ee08a;
+  white-space:nowrap;text-shadow:0 1px 3px #000}
+.res.up b{animation:resup .35s ease}
+@keyframes resup{0%{transform:scale(1)}40%{transform:scale(1.15);color:#fff8dd}100%{transform:scale(1)}}
+.res.lack{animation:lackf .5s ease 2}
+@keyframes lackf{0%,100%{border-color:#a3762c}
+  50%{border-color:#ff5a3c;box-shadow:0 0 20px rgba(255,70,40,.85)}}
 
-/* ---------- 開場鉤子 ---------- */
-#hook{position:absolute;inset:0;z-index:38;cursor:pointer}
+#phaseRow{display:flex;align-items:center;gap:9px;margin:8px 2px 5px}
+#phaseTag{font-size:17px;font-weight:900;color:#1a0f04;letter-spacing:2px;padding:2px 10px;
+  border-radius:6px;background:linear-gradient(180deg,#ffd980,#c98a15);box-shadow:0 2px 6px rgba(0,0,0,.6)}
+#phaseTxt{flex:1;font-size:21px;font-weight:900;color:#f3e5c6;text-shadow:0 2px 5px rgba(0,0,0,.9);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#phaseNum{font-size:21px;font-weight:900;color:var(--goldL);font-variant-numeric:tabular-nums}
+#pbar{height:14px;border-radius:9px;background:rgba(0,0,0,.74);border:2px solid #a37b2c;
+  overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.6)}
+#pfill{height:100%;width:0%;border-radius:7px;transition:width .5s ease;
+  background:linear-gradient(90deg,#ffb63c,#ffe9a8 60%,#fff8dd);
+  box-shadow:0 0 16px rgba(255,190,70,.9)}
+#logoTop{position:absolute;top:188px;left:16px;width:142px;z-index:20;opacity:.8;
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,.95))}
+
+/* ================= 右側圓形功能鈕（仿遊戲側邊列）================= */
+#side{position:absolute;right:12px;top:206px;z-index:23;display:flex;flex-direction:column;gap:12px;
+  opacity:0;transition:opacity .5s ease}
+#side.on{opacity:1}
+.sbtn{width:74px;height:74px;border-radius:50%;border:2px solid var(--gold);cursor:pointer;
+  background:radial-gradient(circle at 36% 28%,rgba(58,40,18,.96),rgba(14,10,5,.97));
+  box-shadow:0 0 0 1px rgba(255,230,170,.2) inset,0 6px 14px rgba(0,0,0,.7);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:inherit}
+.sbtn .si{font-size:26px;font-weight:900;color:var(--goldL);line-height:1;text-shadow:0 2px 0 #4a2205}
+.sbtn .sl{margin-top:2px;font-size:14px;font-weight:700;color:#c9ad7c;letter-spacing:1px}
+.sbtn.hot{border-color:#ffd980;animation:sglow 1.5s ease-in-out infinite}
+@keyframes sglow{0%,100%{box-shadow:0 0 0 1px rgba(255,230,170,.2) inset,0 6px 14px rgba(0,0,0,.7),0 0 12px rgba(255,190,60,.4)}
+  50%{box-shadow:0 0 0 1px rgba(255,230,170,.2) inset,0 6px 14px rgba(0,0,0,.7),0 0 30px rgba(255,190,60,.95)}}
+.sbtn .sdot{position:absolute;margin:-26px 0 0 26px;width:17px;height:17px;border-radius:50%;
+  display:none;border:2px solid #fff;background:radial-gradient(circle at 34% 28%,#ff9c8c,#e81c1c 58%,#8c0a0a);
+  box-shadow:0 0 10px rgba(255,50,50,.95);animation:dotp 1.05s ease-in-out infinite}
+.sbtn.hot .sdot{display:block}
+@keyframes dotp{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+
+/* ================= 底部導覽 ================= */
+#nav{position:absolute;left:0;right:0;bottom:0;height:96px;z-index:25;display:flex;opacity:0;
+  background:linear-gradient(180deg,rgba(14,10,6,.9),rgba(6,4,3,.98));
+  border-top:2px solid rgba(216,163,61,.6);transition:opacity .5s ease}
+#nav.on{opacity:1}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  cursor:pointer;position:relative;font-family:inherit;background:none;border:none}
+.nb .ni{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  font-size:24px;font-weight:900;color:#a8937a;
+  background:linear-gradient(180deg,rgba(46,33,16,.9),rgba(16,11,6,.95));
+  border:2px solid rgba(163,118,44,.7)}
+.nb .nl{font-size:18px;font-weight:900;color:#a8937a;letter-spacing:1px}
+.nb.act .ni{color:#2a1a06;background:linear-gradient(180deg,#ffe08a,#c98a15);border-color:#ffe9a8;
+  box-shadow:0 0 16px rgba(255,190,60,.75)}
+.nb.act .nl{color:var(--goldL)}
+.nb.act::before{content:"";position:absolute;top:-2px;left:22%;right:22%;height:3px;border-radius:2px;
+  background:linear-gradient(90deg,transparent,#ffe9a8,transparent)}
+.nb .ndot{position:absolute;top:12px;right:26%;width:15px;height:15px;border-radius:50%;display:none;
+  border:2px solid #fff;background:radial-gradient(circle at 34% 28%,#ff9c8c,#e81c1c 58%,#8c0a0a);
+  box-shadow:0 0 9px rgba(255,50,50,.95);animation:dotp 1.05s ease-in-out infinite}
+.nb.tip .ndot{display:block}
+
+/* ================= 建築工地 ================= */
+.spot{position:absolute;width:126px;height:126px;margin:-63px 0 0 -63px;z-index:16;cursor:pointer}
+.spot.done{pointer-events:none;animation:spotout .5s ease forwards}
+@keyframes spotout{to{opacity:0;transform:scale(1.5)}}
+.spot .ring{position:absolute;inset:0;border-radius:50%;border:4px solid rgba(255,214,110,.9);
+  box-shadow:0 0 22px rgba(255,190,60,.7),0 0 18px rgba(255,190,60,.5) inset;
+  animation:spotp 1.6s ease-out infinite}
+.spot .ring:nth-child(2){animation-delay:.8s}
+@keyframes spotp{0%{transform:scale(.62);opacity:1}100%{transform:scale(1.08);opacity:0}}
+.spot .core{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px 0 0 -30px;
+  border-radius:14px;border:3px solid #fff2c8;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,rgba(255,244,205,.96),rgba(214,152,32,.94));
+  box-shadow:0 0 20px rgba(255,200,80,.95);font-size:25px;font-weight:900;color:#5c3406}
+.spot .nm{position:absolute;left:50%;top:100%;transform:translateX(-50%);white-space:nowrap;
+  margin-top:1px;font-size:21px;font-weight:900;color:#fff;letter-spacing:2px;
+  text-shadow:0 0 4px #000,0 2px 6px #000}
+.spot .cost{position:absolute;left:50%;top:calc(100% + 26px);transform:translateX(-50%);
+  display:flex;gap:4px;white-space:nowrap}
+.spot .cost em{font-style:normal;font-size:16px;font-weight:900;padding:1px 6px;border-radius:6px;
+  background:rgba(8,6,4,.85);border:1px solid rgba(255,214,110,.5);color:var(--goldL);
+  text-shadow:0 1px 3px #000}
+.spot .cost em.no{color:#ff9d8b;border-color:rgba(255,90,60,.75)}
+.spot.poor{opacity:.6}
+.spot.poor .ring{animation:none;opacity:.22}
+.spot.poor .core{filter:grayscale(.65) brightness(.72)}
+.spot.rdy .core{animation:corerdy 1.1s ease-in-out infinite}
+@keyframes corerdy{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.spot .dot{position:absolute;top:-3px;right:-3px;width:18px;height:18px;border-radius:50%;display:none;
+  border:2px solid #fff;background:radial-gradient(circle at 34% 28%,#ff9c8c,#e81c1c 58%,#8c0a0a);
+  box-shadow:0 0 10px rgba(255,50,50,.95);animation:dotp 1.05s ease-in-out infinite}
+.spot.rdy .dot{display:block}
+.spot.hit .core{animation:corehit .22s ease}
+@keyframes corehit{0%{transform:scale(1)}45%{transform:scale(1.28)}100%{transform:scale(1)}}
+
+/* 採集節點 */
+.node{position:absolute;width:60px;height:60px;margin:-30px 0 0 -30px;z-index:17;cursor:pointer;
+  border-radius:14px;display:flex;align-items:center;justify-content:center;
+  font-size:25px;font-weight:900;color:#1b1207;border:3px solid rgba(255,255,255,.85);
+  box-shadow:0 0 22px rgba(255,220,140,.8),0 4px 10px rgba(0,0,0,.6);
+  animation:nodein .35s cubic-bezier(.2,1.5,.4,1),nodeb 1.5s ease-in-out infinite .35s}
+@keyframes nodein{from{opacity:0;transform:scale(.3)}to{opacity:1}}
+@keyframes nodeb{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.node.w{background:linear-gradient(180deg,#d8b478,#8a6428)}
+.node.i{background:linear-gradient(180deg,#dde5ec,#87949f)}
+.node.t{background:linear-gradient(180deg,#f4a596,#a83428)}
+.node.gone{pointer-events:none;animation:nodeout .35s ease forwards}
+@keyframes nodeout{to{opacity:0;transform:scale(1.7)}}
+
+/* 特效 */
+.rep{position:absolute;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;z-index:18;
+  pointer-events:none;border:8px solid rgba(255,220,140,.95);
+  box-shadow:0 0 46px rgba(255,190,60,.95);animation:repw .8s ease-out forwards}
+@keyframes repw{0%{opacity:1;transform:scale(.3)}100%{opacity:0;transform:scale(7)}}
+.mote{position:absolute;width:11px;height:11px;border-radius:50%;z-index:18;pointer-events:none;
+  background:radial-gradient(circle at 35% 30%,#fffbe6,#ffc63c 60%,rgba(224,138,16,0));
+  box-shadow:0 0 14px rgba(255,200,80,.95)}
+.float{position:absolute;z-index:34;font-size:31px;font-weight:900;color:#ffe27a;white-space:nowrap;
+  text-shadow:0 2px 0 #6b3d06,0 0 14px rgba(255,190,60,.85);pointer-events:none;
+  animation:fly 1.05s ease-out forwards}
+.float.w{color:#e8c98d}.float.i{color:#dfe8ef}.float.t{color:#ffb0a0}
+.float.no{color:#ff8f7a;text-shadow:0 2px 0 #5a0f0f,0 0 14px rgba(255,80,60,.85)}
+@keyframes fly{0%{opacity:0;transform:translate(-50%,0) scale(.7)}
+  18%{opacity:1;transform:translate(-50%,-22px) scale(1.12)}
+  100%{opacity:0;transform:translate(-50%,-130px) scale(1)}}
+
+/* ================= 名將卡（仿名將錄金框）================= */
+#lineup{position:absolute;left:0;right:0;bottom:106px;height:212px;z-index:19;
+  display:flex;align-items:flex-end;justify-content:center;gap:8px}
+.slot{position:relative;width:214px;height:212px}
+.card{position:absolute;inset:0;border-radius:12px;overflow:hidden;opacity:.34;
+  background:linear-gradient(180deg,rgba(24,18,10,.92),rgba(10,7,4,.94));
+  border:3px solid #6b5124;transition:opacity .45s ease,border-color .5s ease,box-shadow .5s ease}
+.slot.in .card{opacity:1;border-color:var(--gold);
+  box-shadow:0 0 0 1px rgba(255,230,170,.25) inset,0 8px 20px rgba(0,0,0,.75)}
+.slot.lit .card{border-color:#ffe08a;box-shadow:0 0 0 1px rgba(255,240,190,.35) inset,
+  0 8px 20px rgba(0,0,0,.75),0 0 26px rgba(255,190,60,.6)}
+.card img{position:absolute;left:50%;top:-6px;width:206px;transform:translateX(-50%);
+  filter:brightness(0);transition:filter .55s ease}
+.slot.lit .card img{filter:none}
+.card .stars{position:absolute;top:5px;left:7px;font-size:16px;color:#ffd166;letter-spacing:1px;
+  text-shadow:0 1px 3px #000;opacity:0;transition:opacity .4s ease .25s}
+.slot.in .card .stars{opacity:1}
+.card .np{position:absolute;left:0;right:0;bottom:0;padding:5px 8px 6px;text-align:center;
+  background:linear-gradient(180deg,rgba(10,7,4,0),rgba(10,7,4,.92) 42%)}
+.card .np .n1{font-size:23px;font-weight:900;color:var(--goldL);letter-spacing:3px;
+  text-shadow:0 2px 0 #4a2205}
+.card .np .n2{margin-top:2px;font-size:16px;font-weight:900;color:#8ee08a;opacity:0;
+  transition:opacity .4s ease .45s}
+.slot.in .card .np .n2{opacity:1}
+.slot .lock{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:22px;
+  font-weight:900;color:#8a7c66;letter-spacing:3px;text-shadow:0 2px 5px #000;transition:opacity .3s}
+.slot.in .lock{opacity:0}
+.slot .flash{position:absolute;inset:0;pointer-events:none;opacity:0;border-radius:12px;
+  background:radial-gradient(closest-side,rgba(255,245,205,.95),rgba(255,190,60,0) 72%)}
+.slot.pop .flash{animation:sflash .75s ease-out}
+@keyframes sflash{0%{opacity:0;transform:scale(.4)}22%{opacity:1;transform:scale(1)}
+  100%{opacity:0;transform:scale(1.35)}}
+
+/* ================= 對話 / 橫幅 ================= */
+#speech{position:absolute;left:18px;right:18px;bottom:330px;z-index:21;padding:10px 18px;
+  border-radius:14px;opacity:0;background:var(--panel);border:2px solid #c99a3c;
+  box-shadow:0 0 0 1px rgba(255,230,170,.2) inset,0 10px 26px rgba(0,0,0,.72);
+  transition:opacity .35s ease}
+#speech.on{opacity:1;animation:spin2 .4s ease}
+@keyframes spin2{from{transform:translateY(10px)}to{transform:none}}
+#speech .who{font-size:21px;font-weight:900;color:#ffd166;letter-spacing:3px;margin-right:9px}
+#speech .what{font-size:24px;font-weight:700;color:#f3e5c6}
+
+#banner{position:absolute;left:0;right:0;top:38%;z-index:47;text-align:center;pointer-events:none;opacity:0}
+#banner.go{animation:bb 2s ease-out}
+@keyframes bb{0%{opacity:0;transform:scale(.65)}14%{opacity:1;transform:scale(1)}
+  72%{opacity:1}100%{opacity:0;transform:scale(1.06)}}
+#banner .n1{font-size:62px;font-weight:900;color:var(--goldL);letter-spacing:6px;
+  text-shadow:0 5px 0 #7a2b06,0 0 44px rgba(255,180,50,.95)}
+#banner .n2{margin-top:10px;font-size:34px;font-weight:900;color:#8ee08a;letter-spacing:2px;
+  text-shadow:0 3px 0 #0d3d0d,0 0 24px rgba(90,220,110,.75)}
+
+/* ================= 出謀劃策 ================= */
+#counsel{position:absolute;inset:0;z-index:50;display:none;background:rgba(5,4,3,.8)}
+#counsel.on{display:flex;align-items:center;justify-content:center}
+#cpanel{width:660px;border-radius:20px;overflow:hidden;background:var(--panel);
+  border:3px solid var(--gold);box-shadow:0 0 0 1px rgba(255,230,170,.28) inset,0 22px 54px rgba(0,0,0,.85);
+  animation:pop .38s cubic-bezier(.2,1.5,.4,1)}
+@keyframes pop{0%{opacity:0;transform:scale(.78)}100%{opacity:1;transform:scale(1)}}
+#chead{display:flex;align-items:center;gap:10px;padding:12px 20px;
+  background:linear-gradient(180deg,rgba(122,43,6,.95),rgba(60,18,4,.95));
+  border-bottom:2px solid rgba(216,163,61,.7)}
+#chead .ct{font-size:29px;font-weight:900;color:var(--goldL);letter-spacing:5px;
+  text-shadow:0 2px 0 #4a1a04}
+#chead .cn{margin-left:auto;font-size:20px;font-weight:900;color:#e9c07a}
+#cbody{display:flex;gap:14px;padding:18px 20px 6px}
+#cface{flex:0 0 168px;height:168px;border-radius:12px;overflow:hidden;position:relative;
+  border:2px solid #a3762c;background:linear-gradient(180deg,rgba(20,15,8,.9),rgba(8,6,3,.95))}
+#cface img{position:absolute;left:50%;top:-8px;width:176px;transform:translateX(-50%)}
+#cface .cfn{position:absolute;left:0;right:0;bottom:0;text-align:center;padding:3px 0 4px;
+  font-size:19px;font-weight:900;color:var(--goldL);
+  background:linear-gradient(180deg,rgba(8,6,3,0),rgba(8,6,3,.92) 45%)}
+#ctext{flex:1;font-size:25px;line-height:1.5;color:#f3e5c6;text-shadow:0 2px 5px rgba(0,0,0,.9)}
+#ctext .q{display:block;margin-top:8px;font-size:21px;color:#e9c07a}
+#copts{padding:6px 20px 20px;display:flex;flex-direction:column;gap:11px}
+.copt{width:100%;padding:15px 18px;border-radius:14px;text-align:left;cursor:pointer;
+  font-family:inherit;font-size:26px;font-weight:900;color:#4a2205;letter-spacing:1px;
+  background:linear-gradient(180deg,#ffe9a8 0%,#f5c33c 30%,#d98f1c 70%,#a35c07 100%);
+  border:none;box-shadow:0 0 0 2px #7a4a0c,0 7px 0 #5b2f05,0 12px 22px rgba(0,0,0,.6);
+  text-shadow:0 1px 0 rgba(255,255,255,.4)}
+.copt:active{transform:translateY(5px);box-shadow:0 0 0 2px #7a4a0c,0 2px 0 #5b2f05}
+.copt small{display:block;margin-top:3px;font-size:19px;font-weight:700;color:#6b3a08}
+#cres{padding:0 20px 20px;display:none}
+#cres.on{display:block;animation:pop .35s ease}
+#cres .rv{font-size:40px;font-weight:900;letter-spacing:6px;text-align:center}
+#cres.good .rv{color:var(--goldL);text-shadow:0 4px 0 #7a3c06,0 0 30px rgba(255,190,60,.8)}
+#cres.bad .rv{color:#c9c2bb;text-shadow:0 4px 0 #2b2622}
+#cres .rc{margin-top:8px;font-size:23px;font-weight:700;color:#f3e5c6;text-align:center;line-height:1.45}
+#cres .rr{margin-top:12px;font-size:27px;font-weight:900;color:#8ee08a;text-align:center}
+#cres .rg{margin-top:12px;font-size:20px;font-weight:700;color:#c9b58e;text-align:center;
+  animation:blink 1.4s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:.45}50%{opacity:1}}
+
+/* ================= 點兵出征 ================= */
+#march{position:absolute;left:18px;right:18px;bottom:330px;height:106px;z-index:22;display:none;
+  border:none;border-radius:20px;font-family:inherit;cursor:pointer;overflow:hidden;
+  background:linear-gradient(180deg,#ffe9a8 0%,#f5c33c 26%,#d98f1c 62%,#a35c07 100%);
+  box-shadow:0 0 0 3px #7a4a0c,0 10px 0 #5b2f05,0 18px 32px rgba(0,0,0,.7),0 0 40px rgba(255,170,40,.5)}
+#march.on{display:block;animation:mup .45s cubic-bezier(.2,1.4,.4,1),breathe 1.7s ease-in-out infinite .45s}
+@keyframes mup{from{opacity:0;transform:translateY(24px)}to{opacity:1}}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.024)}}
+#march:active{transform:translateY(7px)}
+#march .t{display:block;font-size:44px;font-weight:900;color:#4a2205;letter-spacing:9px;
+  text-shadow:0 2px 0 rgba(255,255,255,.45)}
+#march .s{display:block;font-size:20px;font-weight:900;color:#6b3a08;margin-top:1px}
+#march.poor{filter:grayscale(.55) brightness(.82);animation:none}
+#march::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);
+  animation:sheen 2.6s ease-in-out infinite}
+@keyframes sheen{0%{left:-60%}55%{left:120%}100%{left:120%}}
+
+/* ================= 開場鉤子 ================= */
+#hook{position:absolute;inset:0;z-index:55;cursor:pointer}
 #hook.off{display:none}
 #hook.fade{animation:hookout .7s ease forwards}
 @keyframes hookout{to{opacity:0}}
 #sil{position:absolute;left:50%;bottom:250px;width:660px;transform:translateX(-50%);
-  filter:brightness(0) drop-shadow(0 0 26px rgba(255,190,60,.55));
-  animation:silin 1.4s ease}
+  filter:brightness(0) drop-shadow(0 0 26px rgba(255,190,60,.55));animation:silin 1.4s ease}
 @keyframes silin{from{opacity:0;transform:translateX(-50%) scale(1.06)}to{opacity:1}}
 #rim{position:absolute;left:50%;bottom:250px;width:660px;transform:translateX(-50%);
   mix-blend-mode:screen;opacity:.3;
@@ -66,131 +312,57 @@ html,body{width:100%;height:100%;overflow:hidden;background:#07060a;
 @keyframes rimsweep{0%,100%{opacity:.16}50%{opacity:.42}}
 #hookTxt{position:absolute;left:0;right:0;top:150px;text-align:center;z-index:2}
 #hookTxt .l1{font-size:50px;font-weight:900;color:#fff;letter-spacing:5px;line-height:1.42;
-  text-shadow:0 3px 0 rgba(0,0,0,.9),0 0 30px rgba(0,0,0,.95);
-  animation:l1in 1.1s ease .25s both}
+  text-shadow:0 3px 0 rgba(0,0,0,.9),0 0 30px rgba(0,0,0,.95);animation:l1in 1.1s ease .25s both}
 #hookTxt .l1 b{color:#ffd166;text-shadow:0 3px 0 rgba(90,40,4,.9),0 0 34px rgba(255,180,50,.9)}
 @keyframes l1in{from{opacity:0;transform:translateY(-16px)}to{opacity:1}}
 #hookTxt .l2{margin-top:26px;font-size:28px;font-weight:700;color:#e9d5a8;letter-spacing:3px;
   text-shadow:0 2px 8px #000;animation:l1in 1s ease 1.5s both}
 #hookGo{position:absolute;left:0;right:0;bottom:120px;text-align:center;z-index:2;
-  font-size:31px;font-weight:900;color:#ffe9a8;letter-spacing:4px;
+  font-size:31px;font-weight:900;color:var(--goldL);letter-spacing:4px;
   text-shadow:0 3px 0 #7a3c06,0 0 24px rgba(255,190,60,.9);
   animation:blink 1.3s ease-in-out infinite 1.8s both}
-@keyframes blink{0%,100%{opacity:.45}50%{opacity:1}}
 
-/* ---------- 建築修復點 ---------- */
-.spot{position:absolute;width:132px;height:132px;margin:-66px 0 0 -66px;z-index:16;cursor:pointer}
-.spot.done{pointer-events:none;animation:spotout .5s ease forwards}
-@keyframes spotout{to{opacity:0;transform:scale(1.5)}}
-.spot .ring{position:absolute;inset:0;border-radius:50%;border:4px solid rgba(255,214,110,.9);
-  box-shadow:0 0 22px rgba(255,190,60,.7),0 0 18px rgba(255,190,60,.5) inset;
-  animation:spotp 1.6s ease-out infinite}
-.spot .ring:nth-child(2){animation-delay:.8s}
-@keyframes spotp{0%{transform:scale(.62);opacity:1}100%{transform:scale(1.08);opacity:0}}
-.spot .core{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;
-  border-radius:50%;background:radial-gradient(circle at 36% 30%,rgba(255,248,220,.95),rgba(240,181,44,.85) 60%,rgba(164,103,12,.75));
-  border:3px solid #fff2c8;box-shadow:0 0 20px rgba(255,200,80,.95);
-  display:flex;align-items:center;justify-content:center;
-  font-size:27px;font-weight:900;color:#5c3406}
-.spot .nm{position:absolute;left:50%;top:100%;transform:translateX(-50%);white-space:nowrap;
-  margin-top:2px;font-size:23px;font-weight:900;color:#fff;letter-spacing:2px;
-  text-shadow:0 0 4px #000,0 2px 6px #000}
-.spot .meter{position:absolute;left:50%;top:-4px;transform:translateX(-50%);
-  display:flex;gap:5px}
-.spot .meter u{width:16px;height:7px;border-radius:4px;background:rgba(255,255,255,.28);
-  border:1px solid rgba(255,214,110,.6)}
-.spot .meter u.f{background:linear-gradient(90deg,#ffd166,#fff8dd);box-shadow:0 0 10px rgba(255,190,60,.9)}
-.spot.hit .core{animation:corehit .22s ease}
-@keyframes corehit{0%{transform:scale(1)}45%{transform:scale(1.28)}100%{transform:scale(1)}}
+#flash{position:absolute;inset:0;z-index:46;pointer-events:none;opacity:0;background:
+  radial-gradient(58% 42% at 50% 46%,rgba(255,247,214,.98) 0%,rgba(255,206,86,.9) 24%,rgba(255,120,0,0) 76%)}
+#flash.go{animation:fl 1s ease-out}
+@keyframes fl{0%{opacity:0;transform:scale(.6)}13%{opacity:1;transform:scale(1)}
+  100%{opacity:0;transform:scale(1.2)}}
 
-/* 修復爆光 */
-.rep{position:absolute;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;
-  z-index:17;pointer-events:none;border:8px solid rgba(255,220,140,.95);
-  box-shadow:0 0 46px rgba(255,190,60,.95);animation:repw .8s ease-out forwards}
-@keyframes repw{0%{opacity:1;transform:scale(.3)}100%{opacity:0;transform:scale(7)}}
-.mote{position:absolute;width:11px;height:11px;border-radius:50%;z-index:17;pointer-events:none;
-  background:radial-gradient(circle at 35% 30%,#fffbe6,#ffc63c 60%,rgba(224,138,16,0));
-  box-shadow:0 0 14px rgba(255,200,80,.95)}
-.float{position:absolute;z-index:30;font-size:34px;font-weight:900;color:#ffe27a;white-space:nowrap;
-  text-shadow:0 2px 0 #6b3d06,0 0 14px rgba(255,190,60,.85);pointer-events:none;
-  animation:fly 1.05s ease-out forwards}
-@keyframes fly{0%{opacity:0;transform:translate(-50%,0) scale(.7)}
-  18%{opacity:1;transform:translate(-50%,-22px) scale(1.12)}
-  100%{opacity:0;transform:translate(-50%,-130px) scale(1)}}
-
-/* ---------- 名將歸隊 ---------- */
-#speech{position:absolute;left:26px;right:26px;bottom:298px;z-index:19;
-  padding:12px 22px;border-radius:15px;opacity:0;
-  background:linear-gradient(180deg,rgba(34,22,10,.95),rgba(12,8,4,.96));
-  border:2px solid #c99a3c;box-shadow:0 0 0 1px rgba(255,230,170,.2) inset,0 10px 26px rgba(0,0,0,.7);
-  transition:opacity .35s ease}
-#speech.on{opacity:1;animation:spin2 .4s ease}
-@keyframes spin2{from{transform:translateY(10px)}to{transform:none}}
-#speech .who{font-size:23px;font-weight:900;color:#ffd166;letter-spacing:3px;margin-right:10px}
-#speech .what{font-size:27px;font-weight:700;color:#f3e5c6}
-
-#lineup{position:absolute;left:0;right:0;bottom:34px;height:250px;z-index:18;
-  display:flex;align-items:flex-end;justify-content:center;gap:6px}
-.slot{position:relative;width:232px;height:250px;display:flex;flex-direction:column;
-  align-items:center;justify-content:flex-end}
-.slot .ph{position:absolute;bottom:52px;width:150px;height:150px;border-radius:50%;
-  border:3px dashed rgba(190,180,165,.35);opacity:1;transition:opacity .4s}
-.slot.in .ph{opacity:0}
-.slot img{width:232px;display:block;opacity:0;transform:translateY(40px) scale(.94);
-  filter:brightness(0) drop-shadow(0 10px 18px rgba(0,0,0,.85));
-  transition:opacity .5s ease,transform .6s cubic-bezier(.2,1.2,.4,1)}
-.slot.in img{opacity:1;transform:none}
-.slot.lit img{filter:drop-shadow(0 10px 22px rgba(0,0,0,.8)) drop-shadow(0 0 26px rgba(255,190,60,.55));
-  transition:filter .55s ease}
-.slot .tag{margin-top:-2px;padding:3px 14px;border-radius:10px;opacity:0;
-  background:linear-gradient(180deg,rgba(30,19,8,.95),rgba(12,8,4,.95));
-  border:2px solid #c99a3c;font-size:24px;font-weight:900;color:#ffe9a8;letter-spacing:4px;
-  text-shadow:0 2px 0 #4a2205;transition:opacity .4s ease .3s}
-.slot.in .tag{opacity:1}
-.slot .flash{position:absolute;inset:0;pointer-events:none;opacity:0;border-radius:50%;
-  background:radial-gradient(closest-side,rgba(255,245,205,.95),rgba(255,190,60,0) 70%)}
-.slot.pop .flash{animation:sflash .7s ease-out}
-@keyframes sflash{0%{opacity:0;transform:scale(.4)}22%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.3)}}
-
-/* ---------- 完成橫幅 ---------- */
-#done{position:absolute;left:0;right:0;top:40%;z-index:42;text-align:center;pointer-events:none;opacity:0}
-#done.go{animation:doneb 2s ease-out}
-@keyframes doneb{0%{opacity:0;transform:scale(.7)}
-  15%{opacity:1;transform:scale(1)}72%{opacity:1}100%{opacity:0;transform:scale(1.05)}}
-#done .b1{font-size:76px;font-weight:900;color:#ffe9a8;letter-spacing:8px;
-  text-shadow:0 6px 0 #7a2b06,0 0 46px rgba(255,180,50,.95)}
-#done .b2{margin-top:10px;font-size:34px;font-weight:900;color:#fff;letter-spacing:3px;
-  text-shadow:0 3px 8px #000}
-
-/* ---------- 結束卡 ---------- */
-#end{position:absolute;inset:0;z-index:60;display:none;cursor:pointer;padding:0 46px;
+/* ================= 結束卡 ================= */
+#end{position:absolute;inset:0;z-index:60;display:none;cursor:pointer;padding:0 44px;
   background:linear-gradient(180deg,rgba(8,5,3,.9),rgba(8,5,3,.97));
   flex-direction:column;align-items:center;justify-content:center}
 #end.on{display:flex;animation:fadein .6s ease}
 @keyframes fadein{from{opacity:0}to{opacity:1}}
-#end .logo{width:470px;filter:drop-shadow(0 10px 26px rgba(0,0,0,.85));
+#end .logo{width:440px;filter:drop-shadow(0 10px 26px rgba(0,0,0,.85));
   animation:pop .6s cubic-bezier(.2,1.4,.4,1)}
-@keyframes pop{0%{opacity:0;transform:scale(.75)}100%{opacity:1;transform:scale(1)}}
-#end .kw{margin-top:24px;font-size:40px;font-weight:900;color:#fff;letter-spacing:3px;
+#end .kw{margin-top:20px;font-size:38px;font-weight:900;color:#fff;letter-spacing:3px;
   line-height:1.45;text-align:center;text-shadow:0 3px 10px #000}
 #end .kw b{color:#ffd166;text-shadow:0 3px 0 #7a3c06,0 0 30px rgba(255,180,50,.8)}
-#end .hl{margin-top:18px;font-size:44px;font-weight:900;color:#ffe9a8;letter-spacing:4px;
+#end .hl{margin-top:14px;font-size:40px;font-weight:900;color:var(--goldL);letter-spacing:3px;
   text-shadow:0 4px 0 #7a3c06,0 0 32px rgba(255,190,60,.6)}
-#gifts{margin-top:20px;display:flex;gap:12px}
-.gift{flex:1;padding:12px 6px;border-radius:14px;text-align:center;
-  background:linear-gradient(180deg,rgba(44,29,11,.96),rgba(15,10,5,.96));
+#gifts{margin-top:16px;display:flex;gap:10px}
+.gift{flex:1;padding:10px 4px;border-radius:13px;text-align:center;background:var(--panel);
   border:2px solid #c99a3c;box-shadow:0 0 0 1px rgba(255,230,170,.16) inset}
-.gift .g1{font-size:26px;font-weight:900;color:#ffe9a8;letter-spacing:1px}
-.gift .g2{margin-top:2px;font-size:19px;font-weight:700;color:#8ee08a}
-#cta{margin-top:30px;width:100%;height:128px;border:none;border-radius:22px;font-family:inherit;
+.gift .g1{font-size:23px;font-weight:900;color:var(--goldL)}
+.gift .g2{margin-top:2px;font-size:16px;font-weight:700;color:#8ee08a}
+#cta{margin-top:24px;width:100%;height:118px;border:none;border-radius:22px;font-family:inherit;
   background:linear-gradient(180deg,#ffe9a8 0%,#f5c33c 26%,#d98f1c 62%,#a35c07 100%);
   box-shadow:0 0 0 3px #7a4a0c,0 12px 0 #5b2f05,0 20px 40px rgba(0,0,0,.7),0 0 50px rgba(255,170,40,.5);
-  font-size:52px;font-weight:900;color:#4a2205;letter-spacing:8px;cursor:pointer;
+  font-size:48px;font-weight:900;color:#4a2205;letter-spacing:8px;cursor:pointer;
   text-shadow:0 2px 0 rgba(255,255,255,.45);animation:breathe 1.5s ease-in-out infinite}
-@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.026)}}
-#badges{margin-top:26px;display:flex;gap:22px;justify-content:center}
-#badges img{height:72px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.7))}
-#end .fine{margin-top:20px;font-size:19px;color:#9a8a72}
+#badges{margin-top:20px;display:flex;gap:20px;justify-content:center}
+#badges img{height:66px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.7))}
+#end .fine{margin-top:16px;font-size:17px;color:#9a8a72}
+
+/* 提示吐司 */
+#toast{position:absolute;left:50%;bottom:220px;transform:translateX(-50%);z-index:52;
+  padding:9px 22px;border-radius:22px;opacity:0;pointer-events:none;white-space:nowrap;
+  background:rgba(8,6,4,.9);border:2px solid var(--gold);
+  font-size:22px;font-weight:900;color:var(--goldL);text-shadow:0 2px 5px #000}
+#toast.on{animation:tst 1.6s ease}
+@keyframes tst{0%{opacity:0;transform:translate(-50%,12px)}
+  16%{opacity:1;transform:translate(-50%,0)}76%{opacity:1}100%{opacity:0}}
 </style>
 </head>
 <body>
@@ -204,68 +376,124 @@ html,body{width:100%;height:100%;overflow:hidden;background:#07060a;
   <div id="cityRuin"></div>
   <div id="dust"></div>
   <div id="vig"></div>
+  <div class="pillar l"></div><div class="pillar r"></div>
 
-  <div id="hud">
-    <div class="hrow"><span>城池修復 <span class="r" id="repTxt">0 / 6</span></span>
-      <span>名將歸隊 <span class="r" id="genTxt">0 / 3</span></span></div>
+  <div id="top">
+    <div id="resRow">
+      <div class="res" id="resWood"><span class="ic">木</span>
+        <span class="col"><b id="nWood">0</b><i id="rWood">+3 / 秒</i></span></div>
+      <div class="res" id="resIron"><span class="ic">鐵</span>
+        <span class="col"><b id="nIron">0</b><i id="rIron">+2 / 秒</i></span></div>
+      <div class="res" id="resTroop"><span class="ic">兵</span>
+        <span class="col"><b id="nTroop">0</b><i id="rTroop">+2 / 秒</i></span></div>
+    </div>
+    <div id="phaseRow">
+      <span id="phaseTag">營建</span>
+      <span id="phaseTxt">築城屯糧，迎回老將</span>
+      <span id="phaseNum">0 / 6</span>
+    </div>
     <div id="pbar"><div id="pfill"></div></div>
   </div>
   <img id="logoTop" data-a="logo" alt="霸王之業">
 
+  <div id="side">
+    <button class="sbtn" id="sbCounsel"><span class="sdot"></span>
+      <span class="si">謀</span><span class="sl">軍師</span></button>
+    <button class="sbtn" id="sbGeneral"><span class="sdot"></span>
+      <span class="si">將</span><span class="sl">名將</span></button>
+    <button class="sbtn" id="sbBenefit"><span class="sdot"></span>
+      <span class="si">福</span><span class="sl">福利</span></button>
+  </div>
+
   <div id="spots"></div>
+  <div id="nodes"></div>
 
   <div id="speech"><span class="who" id="spWho">關 羽</span><span class="what" id="spWhat"></span></div>
 
+  <button id="march"><span class="t">點兵出征</span><span class="s" id="marchSub">需 兵力 600</span></button>
+
   <div id="lineup">
-    <div class="slot" id="slot0"><div class="ph"></div><div class="flash"></div>
-      <img data-a="guan" alt="關羽"><div class="tag">關 羽</div></div>
-    <div class="slot" id="slot1"><div class="ph"></div><div class="flash"></div>
-      <img data-a="zhuge" alt="諸葛亮"><div class="tag">諸葛亮</div></div>
-    <div class="slot" id="slot2"><div class="ph"></div><div class="flash"></div>
-      <img data-a="huang" alt="皇甫嵩"><div class="tag">皇甫嵩</div></div>
+    <div class="slot" id="slot0"><div class="flash"></div>
+      <div class="card"><img data-a="guan" alt="關羽"><span class="stars">★★★★★</span>
+        <div class="np"><div class="n1">關 羽</div><div class="n2">兵力產出 ×1.5</div></div></div>
+      <div class="lock">未 歸 隊</div></div>
+    <div class="slot" id="slot1"><div class="flash"></div>
+      <div class="card"><img data-a="zhuge" alt="諸葛亮"><span class="stars">★★★★★</span>
+        <div class="np"><div class="n1">諸葛亮</div><div class="n2">木鐵產出 ×1.4</div></div></div>
+      <div class="lock">未 歸 隊</div></div>
+    <div class="slot" id="slot2"><div class="flash"></div>
+      <div class="card"><img data-a="huang" alt="皇甫嵩"><span class="stars">★★★★☆</span>
+        <div class="np"><div class="n1">皇甫嵩</div><div class="n2">全產出 ×1.3</div></div></div>
+      <div class="lock">未 歸 隊</div></div>
   </div>
 
-  <div id="done"><div class="b1">城池已復</div><div class="b2">三將歸位 ‧ 只等主公</div></div>
+  <div id="nav">
+    <button class="nb act" id="nb0"><span class="ndot"></span><span class="ni">城</span><span class="nl">內城</span></button>
+    <button class="nb" id="nb1"><span class="ndot"></span><span class="ni">將</span><span class="nl">名將</span></button>
+    <button class="nb" id="nb2"><span class="ndot"></span><span class="ni">謀</span><span class="nl">謀略</span></button>
+    <button class="nb" id="nb3"><span class="ndot"></span><span class="ni">軍</span><span class="nl">軍務</span></button>
+    <button class="nb" id="nb4"><span class="ndot"></span><span class="ni">界</span><span class="nl">世界</span></button>
+  </div>
+
+  <div id="banner"><div class="n1" id="bn1">關羽歸隊</div><div class="n2" id="bn2">兵力產出 ×1.5</div></div>
+  <div id="flash"></div>
+  <div id="toast"></div>
+
+  <div id="counsel">
+    <div id="cpanel">
+      <div id="chead"><span class="ct">軍師諫言</span><span class="cn" id="cnum">第 1 策 / 3</span></div>
+      <div id="cbody">
+        <div id="cface"><img data-a="zhuge" alt="諸葛亮"><div class="cfn">諸葛亮</div></div>
+        <div id="ctext"><span id="cq"></span><span class="q">主公，當如何？</span></div>
+      </div>
+      <div id="copts"></div>
+      <div id="cres">
+        <div class="rv" id="crv">上 策</div>
+        <div class="rc" id="crc"></div>
+        <div class="rr" id="crr"></div>
+        <div class="rg">點擊任意處繼續</div>
+      </div>
+    </div>
+  </div>
 
   <div id="hook">
     <img id="sil" data-a="guan" alt="">
     <img id="rim" data-a="guan" alt="">
     <div id="hookTxt">
-      <div class="l1">主公，這座城<br>等了你<b>九年</b>。</div>
-      <div class="l2">你的名將，一個都沒走。</div>
+      <div class="l1">主公，<b>九年</b>了。<br>這座城等你來立。</div>
+      <div class="l2">老戰友都在，就等你點兵。</div>
     </div>
-    <div id="hookGo">點擊，修復你的城 ▸</div>
+    <div id="hookGo">點擊，築起你的城 ▸</div>
   </div>
 
   <div id="end">
     <img class="logo" data-a="logo" alt="霸王之業">
-    <div class="kw">你的城與名將，<br><b>都為你保留著</b></div>
-    <div class="hl">S87 旁親明德 ‧ 8/26 開服</div>
+    <div class="kw">老戰友，<br><b>再戰一局</b></div>
+    <div class="hl">S87 旁親明德 ‧ 8/26 新服加開</div>
     <div id="gifts">
-      <div class="gift"><div class="g1">名將試用</div><div class="g2">7 日</div></div>
-      <div class="gift"><div class="g1">玄關羽</div><div class="g2">免費領</div></div>
-      <div class="gift"><div class="g1">回歸禮包</div><div class="g2">登入即送</div></div>
+      <div class="gift"><div class="g1">新服加開</div><div class="g2">8 / 26</div></div>
+      <div class="gift"><div class="g1">名將試用</div><div class="g2">7 日 ‧ 含玄關羽</div></div>
+      <div class="gift"><div class="g1">開服活動</div><div class="g2">福利多重</div></div>
     </div>
-    <button id="cta">回歸領獎</button>
+    <button id="cta">立即下載</button>
     <div id="badges"><img data-a="ios" alt="App Store"><img data-a="gp" alt="Google Play"></div>
     <div class="fine">三國群英傳－霸王之業 ‧ 遊戲畫面示意</div>
   </div>
 </div>
 
 <script>
-/* ================= 素材指派（同一份 base64 供多處使用）================= */
+/* ===== 素材指派（同一份 base64 供多處使用）===== */
 (function(){
   var A=document.getElementById('ASSETS').dataset, im=document.querySelectorAll('img[data-a]');
   for(var i=0;i<im.length;i++) im[i].src=A[im[i].dataset.a];
 })();
 
-/* ================= 舞台縮放 ================= */
 var STAGE_W=720, STAGE_H=1280, stage=document.getElementById('stage');
 function fit(){ stage.style.transform='translate(-50%,-50%) scale('+Math.min(innerWidth/STAGE_W,innerHeight/STAGE_H)+')' }
 addEventListener('resize',fit); addEventListener('orientationchange',fit); fit();
 var $=function(id){return document.getElementById(id)};
 
-/* ================= 廣告 CTA（Meta / Google / IronSource / 通用） ================= */
+/* ===== 廣告 CTA（Meta / Google / IronSource / 通用）===== */
 var STORE_URL='https://play.google.com/store/apps/details?id=com.userjoy.rte&hl=zh_TW';
 function clickThrough(){
   try{ if(window.FbPlayableAd&&FbPlayableAd.onCTAClick){FbPlayableAd.onCTAClick();return;} }catch(e){}
@@ -275,101 +503,288 @@ function clickThrough(){
   try{ window.open(STORE_URL,'_blank'); }catch(e){}
 }
 
-/* ================= 資料 ================= */
-var TAPS=3;                 // 每棟建築要點幾下
+/* ===== 資源：w 木材 / i 鐵礦 / t 兵力 ===== */
+var R={w:40,i:20,t:20};
+var BASE={w:3,i:2,t:2}, ADD={w:0,i:0,t:0}, MUL={w:1,i:1,t:1};
+var RNAME={w:'木材',i:'鐵礦',t:'兵力'}, RCH={w:'木',i:'鐵',t:'兵'};
+function rate(k){ return (BASE[k]+ADD[k])*MUL[k] }
+function nf(n){ return Math.floor(n).toLocaleString('en-US') }
+function resBox(k){ return $(k==='w'?'resWood':k==='i'?'resIron':'resTroop') }
+
 var BUILDINGS=[
-  {n:'宮 城',  x:300,y:296},
-  {n:'兵 營',  x:520,y:404},
-  {n:'集賢府', x:176,y:452},
-  {n:'馬 廄',  x:248,y:636},
-  {n:'工 坊',  x:566,y:664},
-  {n:'計謀房', x:392,y:828}
+  {n:'工 坊',  x:560,y:672, cost:{w:60,i:20,t:0},     gain:{w:4,i:0,t:0}},
+  {n:'馬 廄',  x:250,y:650, cost:{w:90,i:50,t:0},     gain:{w:0,i:0,t:3}},
+  {n:'兵 營',  x:528,y:420, cost:{w:140,i:90,t:40},   gain:{w:0,i:0,t:5}},
+  {n:'集賢府', x:168,y:470, cost:{w:200,i:140,t:60},  gain:{w:3,i:3,t:2}},
+  {n:'計謀房', x:390,y:800, cost:{w:280,i:220,t:100}, gain:{w:0,i:6,t:0}},
+  {n:'宮 城',  x:300,y:330, cost:{w:420,i:340,t:180}, gain:{w:5,i:5,t:4}}
 ];
 var GENERALS=[
-  {slot:0,name:'關 羽',  line:'主公一聲令下，關某即刻回營。'},
-  {slot:1,name:'諸葛亮', line:'亮已備好方略，只待主公點兵。'},
-  {slot:2,name:'皇甫嵩', line:'老夫的兵，一直沒散。'}
+  {slot:0,name:'關 羽',  line:'主公一聲令下，關某即刻披甲。',   buff:'兵力產出 ×1.5', apply:function(){MUL.t*=1.5}},
+  {slot:1,name:'諸葛亮', line:'亮已備好方略，木鐵自當充盈。',   buff:'木鐵產出 ×1.4', apply:function(){MUL.w*=1.4;MUL.i*=1.4}},
+  {slot:2,name:'皇甫嵩', line:'老夫這把年紀，還能為主公點兵。', buff:'全產出 ×1.3',   apply:function(){MUL.w*=1.3;MUL.i*=1.3;MUL.t*=1.3}}
 ];
-var G={fixed:0, gen:0, busy:false, over:false, started:false};
 
-/* ================= 建立修復點 ================= */
+/* ===== 出謀劃策：三國情境二選一 ===== */
+var PLANS=[
+  {q:'敵軍屯糧於烏巢，營中守備鬆懈。',
+   a:{t:'遣輕騎夜襲，焚其糧草',s:'以寡擊眾，斷其根本',good:true,
+      c:'糧草一炬，敵軍不戰自亂。',r:{t:150,w:80,i:60}},
+   b:{t:'正面壓上，強攻其營',s:'兵力硬碰，勝負難料',good:false,
+      c:'雖破一營，我軍亦傷。',r:{t:60,w:20,i:20}}},
+  {q:'江東連日大霧，敵船以鐵索相連。',
+   a:{t:'借風勢以火船焚之',s:'順風而攻，一舉功成',good:true,
+      c:'火借風勢，連環船盡焚。',r:{t:180,w:60,i:120}},
+   b:{t:'遣使議和，暫避鋒芒',s:'保全兵力，另尋良機',good:false,
+      c:'雖免一戰，戰機亦失。',r:{t:70,w:30,i:30}}},
+  {q:'洛陽城高糧足，我軍久攻不下。',
+   a:{t:'圍城斷援，待其自亂',s:'不戰而屈人之兵',good:true,
+      c:'糧道一斷，城中自開。',r:{t:220,w:100,i:100}},
+   b:{t:'全軍猛攻，速戰速決',s:'以傷亡換時間',good:false,
+      c:'雖登其城，士卒折損。',r:{t:80,w:40,i:40}}}
+];
+var MARCH_COST=600;
+var G={built:0,gen:0,plan:0,busy:false,over:false,started:false,phase:'build',marching:false};
+
+/* ===== 工地 ===== */
 BUILDINGS.forEach(function(b,i){
   var d=document.createElement('div');
-  d.className='spot'; d.style.left=b.x+'px'; d.style.top=b.y+'px';
-  d.innerHTML='<div class="ring"></div><div class="ring"></div>'+
-    '<div class="meter">'+new Array(TAPS+1).join('<u></u>')+'</div>'+
-    '<div class="core">修</div><div class="nm">'+b.n+'</div>';
-  d.dataset.i=i; d.dataset.hit='0';
-  d.addEventListener('pointerdown',function(){ tapSpot(d,i) });
+  d.className='spot'; d.style.left=b.x+'px'; d.style.top=b.y+'px'; d.dataset.i=i;
+  var cost='';
+  ['w','i','t'].forEach(function(k){ if(b.cost[k]>0) cost+='<em data-k="'+k+'">'+RCH[k]+b.cost[k]+'</em>' });
+  d.innerHTML='<div class="ring"></div><div class="ring"></div><span class="dot"></span>'+
+    '<div class="core">建</div><div class="nm">'+b.n+'</div><div class="cost">'+cost+'</div>';
+  d.addEventListener('pointerdown',function(){ tryBuild(d,i) });
   $('spots').appendChild(d);
-  // 對應的彩色補丁
-  var p=document.createElement('div');
-  p.className='patch';
+  var p=document.createElement('div'); p.className='patch'; p.dataset.i=i;
   p.style.left=(b.x-180)+'px'; p.style.top=(b.y-180)+'px';
   p.style.backgroundPosition=(-(b.x-180))+'px '+(-(b.y-180))+'px';
-  p.dataset.i=i;
   $('patches').appendChild(p);
 });
-
-/* 蒙塵微粒 */
 (function(){
   var d=$('dust');
   for(var i=0;i<14;i++){
     var m=document.createElement('i');
-    m.style.left=(4+Math.random()*92)+'%';
-    m.style.top=(30+Math.random()*60)+'%';
+    m.style.left=(4+Math.random()*92)+'%'; m.style.top=(30+Math.random()*60)+'%';
     m.style.animationDelay=(Math.random()*9)+'s';
     m.style.animationDuration=(7+Math.random()*6)+'s';
     d.appendChild(m);
   }
 })();
 
-/* ================= 開場鉤子 ================= */
+/* ===== 開場 ===== */
 function startGame(){
   if(G.started) return; G.started=true;
-  var h=$('hook');
-  h.classList.add('fade');
-  setTimeout(function(){ h.classList.add('off') },700);
-  $('hud').classList.add('on');
-  render();
+  $('hook').classList.add('fade');
+  setTimeout(function(){ $('hook').classList.add('off') },700);
+  $('top').classList.add('on'); $('side').classList.add('on'); $('nav').classList.add('on');
+  nodeLoop(); render();
 }
 $('hook').addEventListener('pointerdown',startGame);
-setTimeout(startGame,4200);        // 沒動作也自動進入
+setTimeout(startGame,4200);
 
-/* ================= 修復 ================= */
-function tapSpot(el,i){
-  if(G.busy||G.over) return;
-  if(!G.started){ startGame(); return }
-  var hit=(+el.dataset.hit)+1; el.dataset.hit=hit;
-  var us=el.querySelectorAll('.meter u');
-  if(us[hit-1]) us[hit-1].classList.add('f');
-  el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit');
-  sparkAt(BUILDINGS[i].x,BUILDINGS[i].y,4);
-  if(hit>=TAPS) finishSpot(el,i);
+/* ===== 資源累積 ===== */
+var last=Date.now();
+setInterval(function(){
+  if(!G.started||G.over) return;
+  var now=Date.now(), dt=(now-last)/1000; last=now;
+  R.w+=rate('w')*dt; R.i+=rate('i')*dt; R.t+=rate('t')*dt;
+  renderNums();
+},100);
+
+/* ===== 採集節點 ===== */
+function nodeLoop(){
+  if(G.over) return;
+  if(G.phase!=='counsel' && $('nodes').children.length<3) spawnNode();
+  setTimeout(nodeLoop,900+Math.random()*700);
+}
+function spawnNode(){
+  var keys=['w','i','t'], k=keys[Math.floor(Math.random()*3)];
+  var x=100+Math.random()*520, y=270+Math.random()*520;
+  var n=document.createElement('div');
+  n.className='node '+k; n.textContent=RCH[k];
+  n.style.left=x+'px'; n.style.top=y+'px';
+  var amt=Math.round((10+Math.random()*10)*(1+G.built*0.5));
+  n.addEventListener('pointerdown',function(){
+    if(n.classList.contains('gone')) return;
+    R[k]+=amt;
+    floatText('+'+amt+' '+RNAME[k],x,y-38,k);
+    bump(k); sparkAt(x,y,5);
+    n.classList.add('gone'); setTimeout(function(){n.remove()},360);
+    renderNums();
+  });
+  $('nodes').appendChild(n);
+  setTimeout(function(){ if(!n.classList.contains('gone')){n.classList.add('gone');setTimeout(function(){n.remove()},360)} },5200);
 }
 
-function finishSpot(el,i){
+/* ===== 營建 ===== */
+var pending=null;                      // 名將歸隊動畫期間的點擊先記下來，結束後自動補建
+function tryBuild(el,i){
+  if(G.over) return;
+  if(G.busy){ pending={el:el,i:i}; toast('名將歸隊中 ‧ 稍候即建'); return }
+  if(!G.started){ startGame(); return }
+  var b=BUILDINGS[i];
+  var lack=['w','i','t'].filter(function(k){ return R[k]<b.cost[k] });
+  if(lack.length){
+    lack.forEach(function(k){ var x=resBox(k); x.classList.remove('lack'); void x.offsetWidth; x.classList.add('lack') });
+    floatText('資源不足 ‧ 缺'+lack.map(function(k){return RNAME[k]}).join('、'),b.x,b.y-58,'no');
+    return;
+  }
+  R.w-=b.cost.w; R.i-=b.cost.i; R.t-=b.cost.t;
+  el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit');
+  finishBuild(el,i);
+}
+function finishBuild(el,i){
+  var b=BUILDINGS[i];
   el.classList.add('done');
   var p=$('patches').querySelector('.patch[data-i="'+i+'"]');
   if(p) p.classList.add('on');
-  G.fixed++;
+  G.built++;
+  ADD.w+=b.gain.w; ADD.i+=b.gain.i; ADD.t+=b.gain.t;
 
   var w=document.createElement('div'); w.className='rep';
-  w.style.left=BUILDINGS[i].x+'px'; w.style.top=BUILDINGS[i].y+'px';
+  w.style.left=b.x+'px'; w.style.top=b.y+'px';
   $('spots').appendChild(w); setTimeout(function(){w.remove()},820);
-  sparkAt(BUILDINGS[i].x,BUILDINGS[i].y,14);
-  floatText(BUILDINGS[i].n.replace(/ /g,'')+' 已復',BUILDINGS[i].x,BUILDINGS[i].y-70);
+  sparkAt(b.x,b.y,14);
+  floatText(b.n.replace(/ /g,'')+' 已成',b.x,b.y-62);
+  var up=[]; ['w','i','t'].forEach(function(k){ if(b.gain[k]>0) up.push(RNAME[k]+' +'+b.gain[k]) });
+  if(up.length) setTimeout(function(){ floatText(up.join(' ‧ ')+' / 秒',b.x,b.y-106) },260);
 
-  // 廢墟蒙層隨進度變淡
-  $('cityRuin').style.opacity=Math.max(0,1-G.fixed/BUILDINGS.length*1.05).toFixed(3);
-  $('dust').style.opacity=Math.max(0,1-G.fixed/BUILDINGS.length*1.3).toFixed(3);
+  $('cityRuin').style.opacity=Math.max(0,1-G.built/BUILDINGS.length*1.05).toFixed(3);
+  $('dust').style.opacity=Math.max(0,1-G.built/BUILDINGS.length*1.3).toFixed(3);
   render();
 
-  // 每兩棟 → 一位名將歸隊
-  if(G.fixed%2===0 && G.gen<GENERALS.length) setTimeout(returnGeneral,520);
-  else if(G.fixed>=BUILDINGS.length) setTimeout(allDone,900);
+  if(G.built%2===0 && G.gen<GENERALS.length) setTimeout(returnGeneral,520);
+  else if(G.built>=BUILDINGS.length) setTimeout(toCounsel,700);
 }
 
+/* ===== 名將歸隊（給產出加成）===== */
+function returnGeneral(){
+  var g=GENERALS[G.gen]; if(!g) return;
+  G.gen++; G.busy=true; g.apply();
+  var s=$('slot'+g.slot);
+  s.classList.add('in','pop');
+  setTimeout(function(){ s.classList.add('lit') },420);
+  $('spWho').textContent=g.name; $('spWhat').textContent=g.line;
+  $('speech').classList.add('on');
+  $('bn1').textContent=g.name.replace(/ /g,'')+' 歸隊';
+  $('bn2').textContent=g.buff;
+  var bb=$('banner'); bb.classList.remove('go'); void bb.offsetWidth; bb.classList.add('go');
+  render();
+  setTimeout(function(){
+    G.busy=false;
+    if(pending && !pending.el.classList.contains('done')){
+      var pd=pending; pending=null;
+      tryBuild(pd.el,pd.i);              // 把剛才被擋掉的那一下補回去
+    } else pending=null;
+    if(G.built>=BUILDINGS.length) toCounsel();
+  },1350);
+  setTimeout(function(){ $('speech').classList.remove('on') },2700);
+}
+
+/* ===== 出謀劃策 ===== */
+function toCounsel(){
+  if(G.phase!=='build'||G.over) return;
+  G.phase='counsel';
+  $('cityRuin').style.opacity=0; $('dust').style.opacity=0;
+  $('speech').classList.remove('on');
+  $('sbCounsel').classList.add('hot');
+  $('nb2').classList.add('tip');
+  $('phaseTag').textContent='謀略';
+  $('phaseTxt').textContent='軍師諫言 ‧ 定策而後動';
+  render();
+  toast('城已立 ‧ 請聽軍師諫言');
+  setTimeout(openPlan,900);
+}
+function openPlan(){
+  if(G.plan>=PLANS.length){ toMarch(); return }
+  var p=PLANS[G.plan];
+  $('cnum').textContent='第 '+(G.plan+1)+' 策 / '+PLANS.length;
+  $('cq').textContent=p.q;
+  $('cres').classList.remove('on','good','bad');
+  var box=$('copts'); box.innerHTML=''; box.style.display='flex';
+  ['a','b'].forEach(function(key){
+    var o=p[key], btn=document.createElement('button');
+    btn.className='copt';
+    btn.innerHTML=o.t+'<small>'+o.s+'</small>';
+    btn.addEventListener('click',function(){ pickPlan(key) });
+    box.appendChild(btn);
+  });
+  $('counsel').classList.add('on');
+}
+function pickPlan(key){
+  var p=PLANS[G.plan], o=p[key];
+  $('copts').style.display='none';
+  var cr=$('cres');
+  cr.classList.add('on', o.good?'good':'bad');
+  $('crv').textContent=o.good?'上 策':'下 策';
+  $('crc').textContent=o.c;
+  var got=[];
+  ['t','w','i'].forEach(function(k){ if(o.r[k]){ R[k]+=o.r[k]; got.push(RNAME[k]+' +'+o.r[k]); bump(k) } });
+  $('crr').textContent=got.join(' ‧ ');
+  renderNums();
+  var done=false;
+  function next(){
+    if(done) return; done=true;
+    cr.classList.remove('on');
+    $('counsel').classList.remove('on');
+    G.plan++;
+    render();
+    setTimeout(function(){ if(G.plan<PLANS.length) openPlan(); else toMarch() },500);
+  }
+  $('counsel').onclick=function(){ next(); $('counsel').onclick=null };
+  setTimeout(function(){ if(!done) next() },2600);
+}
+
+/* ===== 點兵出征 ===== */
+function toMarch(){
+  if(G.marching||G.over) return;
+  G.marching=true; G.phase='march';
+  $('sbCounsel').classList.remove('hot');
+  $('nb2').classList.remove('tip');
+  $('nb0').classList.remove('act'); $('nb4').classList.add('act');
+  $('phaseTag').textContent='出征';
+  $('phaseTxt').textContent='三將待命 ‧ 點兵取洛陽';
+  $('march').classList.add('on');
+  toast('謀略已定 ‧ 可以出兵了');
+  render();
+}
+$('march').addEventListener('click',function(){
+  if(!G.marching||G.over) return;
+  if(R.t<MARCH_COST){
+    var x=resBox('t'); x.classList.remove('lack'); void x.offsetWidth; x.classList.add('lack');
+    floatText('兵力不足，再徵些兵',360,700,'no'); return;
+  }
+  R.t-=MARCH_COST; renderNums(); G.over=true;
+  $('march').classList.remove('on');
+  var f=$('flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
+  $('bn1').textContent='大軍出征'; $('bn2').textContent='新城已立 ‧ 三將歸位';
+  var bb=$('banner'); bb.classList.remove('go'); void bb.offsetWidth; bb.classList.add('go');
+  for(var i=0;i<3;i++) setTimeout(function(){ sparkAt(130+Math.random()*460,420+Math.random()*280,12) },i*220);
+  setTimeout(function(){ $('end').classList.add('on') },2100);
+});
+
+/* ===== 側邊 / 導覽（引導用，不做假功能）===== */
+$('sbCounsel').addEventListener('click',function(){
+  if(G.phase==='counsel'&&G.plan<PLANS.length){ openPlan(); return }
+  toast(G.phase==='build'?'先把城立起來，再議謀略':'謀略已定，該出兵了');
+});
+$('sbGeneral').addEventListener('click',function(){
+  toast(G.gen<3?('名將歸隊 '+G.gen+' / 3 ‧ 續建城池'):'三將已歸位');
+});
+$('sbBenefit').addEventListener('click',function(){ toast('新服加開 ‧ 開服福利多重') });
+[['nb0','內城：點工地築城'],['nb1','名將：每建兩處迎回一將'],
+ ['nb2','謀略：立城後開放'],['nb3','軍務：徵集資源'],['nb4','世界：點兵出征']]
+.forEach(function(a){ $(a[0]).addEventListener('click',function(){ toast(a[1]) }) });
+
+var toastT=null;
+function toast(t){
+  var el=$('toast'); el.textContent=t;
+  el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
+  clearTimeout(toastT); toastT=setTimeout(function(){ el.classList.remove('on') },1600);
+}
+
+/* ===== 特效 / 顯示 ===== */
 function sparkAt(x,y,n){
   if(!Element.prototype.animate) return;
   for(var i=0;i<n;i++){
@@ -384,51 +799,45 @@ function sparkAt(x,y,n){
     setTimeout(function(el){return function(){el.remove()}}(m),du+60);
   }
 }
-function floatText(t,x,y){
-  var d=document.createElement('div'); d.className='float'; d.textContent=t;
+function floatText(t,x,y,cls){
+  var d=document.createElement('div'); d.className='float'+(cls?' '+cls:''); d.textContent=t;
   d.style.left=x+'px'; d.style.top=y+'px';
   stage.appendChild(d); setTimeout(function(){d.remove()},1080);
 }
+function bump(k){ var x=resBox(k); x.classList.remove('up'); void x.offsetWidth; x.classList.add('up') }
 
-/* ================= 名將歸隊 ================= */
-function returnGeneral(){
-  var g=GENERALS[G.gen]; if(!g) return;
-  G.gen++; G.busy=true;
-  var s=$('slot'+g.slot);
-  s.classList.add('in','pop');
-  setTimeout(function(){ s.classList.add('lit') },420);   // 剪影 → 亮起
-  $('spWho').textContent=g.name;
-  $('spWhat').textContent=g.line;
-  $('speech').classList.add('on');
-  render();
-  setTimeout(function(){
-    G.busy=false;
-    if(G.fixed>=BUILDINGS.length) allDone();
-  },1250);
-  setTimeout(function(){ $('speech').classList.remove('on') },2600);
-}
-
-/* ================= 完成 → 結束卡 ================= */
-function allDone(){
-  if(G.over) return;
-  G.over=true;
-  // 沒歸隊的補齊
-  while(G.gen<GENERALS.length){
-    var g=GENERALS[G.gen++]; var s=$('slot'+g.slot);
-    s.classList.add('in','lit');
+function renderNums(){
+  $('nWood').textContent=nf(R.w); $('nIron').textContent=nf(R.i); $('nTroop').textContent=nf(R.t);
+  $('rWood').textContent='+'+nf(rate('w'))+' / 秒';
+  $('rIron').textContent='+'+nf(rate('i'))+' / 秒';
+  $('rTroop').textContent='+'+nf(rate('t'))+' / 秒';
+  renderSpots();
+  if(G.marching){
+    var ok=R.t>=MARCH_COST;
+    $('march').classList.toggle('poor',!ok);
+    $('marchSub').textContent=ok?('兵力 '+nf(R.t)+' ‧ 消耗 '+MARCH_COST):('需 兵力 '+MARCH_COST+'（現有 '+nf(R.t)+'）');
   }
-  $('cityRuin').style.opacity=0;
-  $('dust').style.opacity=0;
-  $('speech').classList.remove('on');
-  var d=$('done'); d.classList.remove('go'); void d.offsetWidth; d.classList.add('go');
-  render();
-  setTimeout(function(){ $('end').classList.add('on') },2000);
 }
-
+function renderSpots(){
+  var sp=$('spots').querySelectorAll('.spot');
+  for(var j=0;j<sp.length;j++){
+    var el=sp[j]; if(el.classList.contains('done')) continue;
+    var b=BUILDINGS[+el.dataset.i], ok=true, ems=el.querySelectorAll('.cost em');
+    for(var m=0;m<ems.length;m++){
+      var k=ems[m].dataset.k, enough=R[k]>=b.cost[k];
+      ems[m].classList.toggle('no',!enough);
+      if(!enough) ok=false;
+    }
+    el.classList.toggle('rdy',ok); el.classList.toggle('poor',!ok);
+  }
+}
 function render(){
-  $('repTxt').textContent=G.fixed+' / '+BUILDINGS.length;
-  $('genTxt').textContent=G.gen+' / '+GENERALS.length;
-  $('pfill').style.width=(G.fixed/BUILDINGS.length*100)+'%';
+  if(G.phase==='build'){ $('phaseNum').textContent=G.built+' / '+BUILDINGS.length;
+    $('pfill').style.width=(G.built/BUILDINGS.length*100)+'%'; }
+  else if(G.phase==='counsel'){ $('phaseNum').textContent=G.plan+' / '+PLANS.length;
+    $('pfill').style.width=(G.plan/PLANS.length*100)+'%'; }
+  else { $('phaseNum').textContent='待 出 兵'; $('pfill').style.width='100%'; }
+  renderNums();
 }
 
 $('end').addEventListener('click',clickThrough);
