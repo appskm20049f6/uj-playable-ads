@@ -42,18 +42,37 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
 .lvbox b{display:block;font-size:36px;color:#ffe9a8;line-height:1;text-shadow:0 2px 0 #4a1010}
 .lvbox i{font-style:normal;font-size:18px;color:#e9c07a;letter-spacing:2px}
 
-#xpwrap{margin-top:12px}
-.xplabel{display:flex;justify-content:space-between;font-size:21px;font-weight:700;
-  color:#e9d5a8;text-shadow:0 1px 3px #000;margin-bottom:5px;padding:0 4px}
-.xplabel .pw{color:#ffb98a}
-#xpbar{height:18px;border-radius:12px;background:rgba(0,0,0,.66);
+#xpwrap{margin-top:11px}
+.xplabel{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  font-size:22px;font-weight:900;color:#f3e5c6;text-shadow:0 1px 3px #000;margin-bottom:5px;padding:0 2px}
+.qtag{flex:0 0 auto;font-size:18px;font-weight:900;color:#1a0f04;letter-spacing:2px;
+  background:linear-gradient(180deg,#ffd980,#c98a15);border-radius:6px;padding:2px 9px;
+  box-shadow:0 2px 6px rgba(0,0,0,.6)}
+.qname{flex:1 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#goalTxt{flex:0 0 auto;color:#ffe9a8;font-variant-numeric:tabular-nums}
+#xpbar{position:relative;height:26px;border-radius:14px;background:rgba(0,0,0,.7);
   border:2px solid #a37b2c;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.5)}
-#xpfill{height:100%;width:0%;border-radius:10px;
+#xpfill{height:100%;width:0%;border-radius:12px;
   background:linear-gradient(90deg,#ffb63c,#ffe9a8 60%,#fff8dd);
   box-shadow:0 0 16px rgba(255,190,70,.9);transition:width .35s ease}
+#xpbar::after{content:"";position:absolute;inset:0;border-radius:12px;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 52%)}
+#xppct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:17px;font-weight:900;color:#fff;letter-spacing:1px;
+  text-shadow:0 1px 2px rgba(0,0,0,.9);pointer-events:none}
+/* 進度 80% 之後：衝刺提示 */
+#xpwrap.rush #xpfill{background:linear-gradient(90deg,#ff7a2b,#ffd166 55%,#fff8dd);
+  animation:rushb .7s ease-in-out infinite alternate}
+@keyframes rushb{from{box-shadow:0 0 14px rgba(255,140,40,.8)}to{box-shadow:0 0 34px rgba(255,190,60,1)}}
+#xpwrap.rush .qtag{background:linear-gradient(180deg,#ff8a4a,#c93a05);color:#fff;
+  animation:dotp .8s ease-in-out infinite}
+.substats{display:flex;justify-content:space-between;margin-top:5px;padding:0 3px;
+  font-size:19px;font-weight:700;color:#c9b58e;text-shadow:0 1px 3px #000}
+.substats .pw{color:#ffb98a}
+
 
 /* ---------- 對話框（軍師諫言風） ---------- */
-#talk{position:absolute;left:36px;right:36px;top:222px;z-index:18;
+#talk{position:absolute;left:36px;right:36px;top:252px;z-index:18;
   background:linear-gradient(180deg,rgba(34,22,10,.93),rgba(12,8,4,.95));
   border:2px solid #c99a3c;border-radius:18px;padding:16px 24px 20px;
   box-shadow:0 0 0 1px rgba(255,230,170,.22) inset,0 12px 30px rgba(0,0,0,.6);
@@ -124,13 +143,22 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
   text-shadow:0 3px 0 #7a3c06,0 0 22px rgba(255,190,60,.9);animation:blink 1.2s ease-in-out infinite}
 
 /* COMBO */
-#combo{position:absolute;right:32px;bottom:496px;z-index:19;text-align:right;
-  pointer-events:none;opacity:0;transition:opacity .18s}
-#combo.on{opacity:1}
-#combo .n{display:block;font-size:82px;font-weight:900;color:#fff;line-height:.92;
-  text-shadow:0 4px 0 #a2540a,0 0 34px rgba(255,190,60,.95)}
-#combo .l{display:block;font-size:25px;font-weight:900;color:#ffd166;letter-spacing:5px;
-  text-shadow:0 2px 4px #000}
+#combo{--ct:0;position:absolute;right:32px;bottom:496px;z-index:19;text-align:right;
+  pointer-events:none;opacity:0;transition:opacity .2s}
+#combo.on{opacity:calc(.68 + var(--ct)*.32)}
+/* 5 連起跳，每 5 連亮一階：字變大、金色轉白熾、外焰變濃 */
+#combo .n{display:block;line-height:.92;font-weight:900;
+  font-size:calc(54px + var(--ct)*40px);
+  color:rgb(255,calc(233 + var(--ct)*22),calc(168 + var(--ct)*87));
+  text-shadow:0 3px 0 rgba(140,72,8,calc(.55 + var(--ct)*.45)),
+    0 0 calc(8px + var(--ct)*26px) rgba(255,190,60,calc(.35 + var(--ct)*.6));
+  transition:font-size .16s ease,color .2s ease}
+#combo .l{display:block;font-weight:900;letter-spacing:5px;
+  font-size:calc(19px + var(--ct)*7px);
+  color:rgba(255,209,102,calc(.6 + var(--ct)*.4));text-shadow:0 2px 4px #000}
+#combo .mul{display:block;margin-top:2px;font-weight:900;letter-spacing:1px;
+  font-size:calc(19px + var(--ct)*7px);
+  color:rgba(142,224,138,calc(.65 + var(--ct)*.35));text-shadow:0 2px 4px #000}
 #combo.pop .n{animation:cpop .2s ease}
 @keyframes cpop{0%{transform:scale(1)}45%{transform:scale(1.3)}100%{transform:scale(1)}}
 /* COMBO 滿級：數字轉爆擊態 */
@@ -141,6 +169,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
 @keyframes maxjit{0%{transform:translate(0,0) scale(1)}25%{transform:translate(-3px,2px) scale(1.02)}
   50%{transform:translate(2px,-2px) scale(1)}75%{transform:translate(-2px,-1px) scale(1.03)}
   100%{transform:translate(0,0) scale(1)}}
+#combo.max .mul{color:#ffd166}
 #combo.max .l{color:#ff9a5a;text-shadow:0 2px 4px #000,0 0 16px rgba(255,90,20,.9)}
 #combo.max .crit{display:inline-block;margin-top:6px;padding:3px 14px;border-radius:11px;
   font-size:29px;font-weight:900;color:#fff;letter-spacing:4px;
@@ -171,6 +200,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
   background:rgba(8,5,3,.62);text-align:center;font-size:23px;font-weight:700;color:#f0dcae;
   text-shadow:0 2px 6px #000;animation:blink 2s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:.5}50%{opacity:1}}
+/* 買得起就亮紅點（.sub 與 #fightBtn 有 overflow:hidden，紅點必須放在框內，
+   否則會像之前的小標籤一樣被裁掉；.bld 沒有裁切，可以放到框外角落） */
+.dot{position:absolute;width:19px;height:19px;border-radius:50%;display:none;z-index:4;
+  background:radial-gradient(circle at 34% 28%,#ff9c8c,#e81c1c 58%,#8c0a0a 100%);
+  border:2px solid #fff;box-shadow:0 0 10px rgba(255,50,50,.95),0 1px 3px rgba(0,0,0,.6);
+  animation:dotp 1.05s ease-in-out infinite}
+.dot.on{display:block}
+@keyframes dotp{0%,100%{transform:scale(1)}50%{transform:scale(1.24)}}
+.bld .dot{top:-7px;left:-6px}
+.sub .dot{top:8px;right:10px}
+
 /* 建設列：三個可購買建築 */
 #bldrow{display:flex;gap:11px;margin-bottom:11px}
 .bld{position:relative;flex:1;padding:9px 4px 8px;border:2px solid #a3762c;border-radius:14px;
@@ -390,7 +430,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
     <div class="txt">點我催糧！</div>
   </div>
 
-  <div id="combo"><b class="n" id="comboN">0</b><span class="l">COMBO</span><span class="crit">爆 擊</span></div>
+  <div id="combo"><b class="n" id="comboN">0</b><span class="l">COMBO</span><span class="mul" id="comboMul">×1.6</span><span class="crit">爆 擊</span></div>
 
   <div id="hud">
     <div class="row">
@@ -405,10 +445,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
     </div>
     <div id="xpwrap">
       <div class="xplabel">
-        <span>戰功 <span id="xpTxt">0 / 2</span> ‧ <span class="pw" id="power">戰力 1,200</span></span>
-        <span id="goalTxt">軍資 80 / 30,000</span>
+        <span class="qtag">主線</span>
+        <span class="qname">積聚軍資 30,000，以圖霸業</span>
+        <span id="goalTxt">100 / 30,000</span>
       </div>
-      <div id="xpbar"><div id="xpfill"></div></div>
+      <div id="xpbar"><div id="xpfill"></div><div id="xppct">0%</div></div>
+      <div class="substats"><span>戰功 <span id="xpTxt">0 / 2</span></span><span class="pw" id="power">戰力 1,200</span></div>
     </div>
   </div>
 
@@ -421,21 +463,23 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0705;
   </div>
 
   <div id="bottom">
-    <div id="tapHint">▲ 連點關羽衝 COMBO，滿 30 觸發爆擊</div>
+    <div id="tapHint">▲ 連點關羽：5 連起跳，每 5 連加倍，30 連爆擊</div>
     <div id="bldrow">
-      <button class="bld" id="bForge"><span class="lv" id="lvForge">Lv.0</span>
+      <button class="bld" id="bForge"><span class="dot" id="dotForge"></span><span class="lv" id="lvForge">Lv.0</span>
         <span class="nm">鍛造坊</span><span class="ef" id="efForge">+14 /秒</span><span class="pr" id="prForge">200 金</span></button>
-      <button class="bld" id="bMarket"><span class="lv" id="lvMarket">Lv.0</span>
+      <button class="bld" id="bMarket"><span class="dot" id="dotMarket"></span><span class="lv" id="lvMarket">Lv.0</span>
         <span class="nm">市 集</span><span class="ef" id="efMarket">+30 /秒</span><span class="pr" id="prMarket">450 金</span></button>
-      <button class="bld" id="bCamp"><span class="lv" id="lvCamp">Lv.0</span>
+      <button class="bld" id="bCamp"><span class="dot" id="dotCamp"></span><span class="lv" id="lvCamp">Lv.0</span>
         <span class="nm">軍 營</span><span class="ef" id="efCamp">+60 /秒</span><span class="pr" id="prCamp">900 金</span></button>
     </div>
     <div id="subrow">
       <button class="sub" id="defBtn">
+        <span class="dot" id="dotDef"></span>
         <span class="t">守 城</span><span class="s">徵繳城中稅賦</span>
         <span class="cd" id="defCd">6</span>
       </button>
       <button class="sub" id="upBtn">
+        <span class="dot" id="dotUp"></span>
         <span class="t">強 化</span><span class="s" id="upSub"><b>收金 +12%</b> ‧ 100 金</span>
       </button>
     </div>
@@ -516,6 +560,7 @@ var LINES={
   poor:['主公，府庫空虛，難以點兵，且待糧至。','無糧不成軍，還請主公稍候。'],
   levelup:['某已受封晉階！自此糧秣倍收，兵馬更盛。','蒙主公拔擢，關某願以此身，報效霸業。'],
   crit:['刀已飲血，勢不可擋！','某這一刀，天地皆震！','主公且看——此乃萬人敵！'],
+  rush:['主公，軍資將足，霸業可圖！','府庫將滿，只待主公一聲令下！','再添些許，便可興兵定天下！'],
   end:['主公，霸業當前，可願與關某同往？']
 };
 function pick(a){return a[Math.floor(Math.random()*a.length)]}
@@ -549,6 +594,7 @@ var G={
   comboT:0,         // 最後一次點擊時間
   buff:1,           // combo 帶來的產金倍率
   critSaid:false,   // 爆擊台詞只講一次
+  rushSaid:false,   // 衝刺台詞只講一次
   busy:false,
   over:false,
   defCool:0
@@ -557,7 +603,13 @@ var RATE_MUL=1.7, MAX_LEVEL=5, MAX_BATTLES=30, DEF_CD=6;
 var GOLD_GOAL=30000;      // 軍資達標 → 彈出廣告頁
 var MAX_TIME=90;          // 保險：最長 90 秒也會進廣告頁（只出戰不蓋建築約需 77 秒，不能切在達標前）
 var COMBO_WINDOW=1600;    // 連點判定時間（毫秒）
-var COMBO_CAP=30;         // combo 加成上限（×4.6 產金 / ×6.4 單點）
+var COMBO_CAP=30;         // combo 封頂（同時是爆擊門檻）
+var COMBO_MIN=5;          // 5 連才開始有 combo
+var COMBO_STEP=5;         // 每 5 連升一階
+/* 階數 0～6：0=無加成，6=封頂爆擊。每階產金 +0.6 倍、單點 +0.9 倍 */
+function comboTier(c){ return c<COMBO_MIN ? 0 : Math.min(6,Math.floor(c/COMBO_STEP)) }
+function tierBuff(t){ return 1 + t*0.6 }        // 產金：1 → 4.6
+function tierGain(t){ return 1 + t*0.9 }        // 單點：1 → 6.4
 var WIN_MUL=4.0;          // 勝仗繳獲 = 出兵成本 ×
 var DEF_MUL=14;           // 守城稅賦 = 每秒產量 ×
 var startT=Date.now();
@@ -586,9 +638,10 @@ function renderBld(){
     $('lv'+b.k).textContent='Lv.'+b.lv;
     $('ef'+b.k).textContent='+'+nf(b.gain)+' /秒';
     $('pr'+b.k).textContent=nf(b.cost)+' 金';
-    var el=$('b'+b.k), afford=G.gold>=b.cost&&!G.busy;
+    var el=$('b'+b.k), afford=G.gold>=b.cost&&!G.busy&&!G.over;
     el.classList.toggle('dim',!afford);
     el.classList.toggle('ready',afford);
+    $('dot'+b.k).classList.toggle('on',afford);   // 買得起就亮紅點
   }
 }
 function buyBld(i){
@@ -616,8 +669,13 @@ function renderRate(){
   elRate.classList.toggle('hot',hot);
 }
 function renderGoal(){
-  elGoal.textContent='軍資 '+nf(G.gold)+' / '+nf(GOLD_GOAL);
-  elXp.style.width=Math.min(100,G.gold/GOLD_GOAL*100)+'%';
+  var pct=Math.min(100,G.gold/GOLD_GOAL*100);
+  elGoal.textContent=nf(G.gold)+' / '+nf(GOLD_GOAL);
+  elXp.style.width=pct+'%';
+  $('xppct').textContent=pct.toFixed(0)+'%';
+  var rush=pct>=80;
+  $('xpwrap').classList.toggle('rush',rush);
+  if(rush && !G.rushSaid && !G.busy){ G.rushSaid=true; say(pick(LINES.rush),true) }
 }
 function renderGlow(){
   var g=Math.min(1,G.gold/GOLD_GOAL), p=Math.min(1,G.power/24000);
@@ -636,6 +694,8 @@ function render(){
   btn.classList.toggle('dim', G.gold<cost()||G.busy);
   upBtn.classList.toggle('dim', G.gold<refineCost()||G.busy);
   upBtn.classList.toggle('ready', G.gold>=refineCost()&&!G.busy);
+  $('dotUp').classList.toggle('on', G.gold>=refineCost()&&!G.busy&&!G.over);
+  $('dotDef').classList.toggle('on', G.defCool<=0&&!G.busy&&!G.over);
   renderBld();
 }
 
@@ -653,6 +713,8 @@ setInterval(function(){
   btn.classList.toggle('dim', G.gold<cost()||G.busy);
   upBtn.classList.toggle('dim', G.gold<refineCost()||G.busy);
   upBtn.classList.toggle('ready', G.gold>=refineCost()&&!G.busy);
+  $('dotUp').classList.toggle('on', G.gold>=refineCost()&&!G.busy&&!G.over);
+  $('dotDef').classList.toggle('on', G.defCool<=0&&!G.busy&&!G.over);
   renderBld();
   if(G.gold>=GOLD_GOAL) endCard();          // 軍資達標 → 廣告頁
   else if((Date.now()-startT)/1000>=MAX_TIME) endCard();   // 保險：時間到也進廣告頁
@@ -665,6 +727,7 @@ setInterval(function(){
     G.combo=0; G.buff=1;
     $('combo').classList.remove('on');
     $('combo').classList.remove('max');
+    $('combo').style.setProperty('--ct',0);
     renderRate();
   }
 },120);
@@ -674,7 +737,7 @@ setInterval(function(){
   if(G.defCool>0){
     G.defCool--;
     $('defCd').textContent=G.defCool;
-    if(G.defCool<=0) defBtn.classList.remove('cool');
+    if(G.defCool<=0){ defBtn.classList.remove('cool'); render() }
   }
 },1000);
 
@@ -697,9 +760,9 @@ hero.addEventListener('pointerdown',function(e){
   var now=Date.now();
   G.combo = (now-G.comboT < COMBO_WINDOW) ? G.combo+1 : 1;
   G.comboT = now;
-  var c=Math.min(G.combo,COMBO_CAP);
-  G.buff = 1 + c*0.12;                          // 產金速度最高 ×4.6
-  var gain = Math.round(G.tap*(1 + c*0.18));    // 單次點擊最高 ×6.4
+  var tier = comboTier(G.combo);                // 0～6，每 5 連升一階
+  G.buff = tierBuff(tier);                      // 產金 ×1 → ×4.6
+  var gain = Math.round(G.tap*tierGain(tier));  // 單點 ×1 → ×6.4
   var crit = G.combo>=COMBO_CAP;                // 滿 30 連 → 爆擊
   if(crit) gain = Math.round(gain*2);           // 爆擊再翻倍
 
@@ -707,8 +770,10 @@ hero.addEventListener('pointerdown',function(e){
   hero.classList.remove('hit'); void hero.offsetWidth; hero.classList.add('hit');
 
   var cb=$('combo');
-  if(G.combo>=2){
+  if(tier>=1){                                  // 5 連才顯示，之後每階更亮
     $('comboN').textContent=G.combo;
+    $('comboMul').textContent='×'+(crit?(tierGain(tier)*2).toFixed(1):tierGain(tier).toFixed(1));
+    cb.style.setProperty('--ct',(tier/6).toFixed(3));
     cb.classList.add('on');
     cb.classList.toggle('max',crit);
     cb.classList.remove('pop'); void cb.offsetWidth; cb.classList.add('pop');
@@ -918,6 +983,8 @@ function endCard(){
   clearInterval(typing); clearTimeout(idleTimer);
   $('combo').classList.remove('on');
   $('combo').classList.remove('max');
+  var ds=document.querySelectorAll('.dot');
+  for(var i=0;i<ds.length;i++) ds[i].classList.remove('on');
   $('end').classList.add('on');
 }
 $('end').addEventListener('click',clickThrough);
