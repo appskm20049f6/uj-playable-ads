@@ -550,13 +550,28 @@ addEventListener('resize',fit); addEventListener('orientationchange',fit); fit()
 var $=function(id){return document.getElementById(id)};
 
 /* ===== 廣告 CTA（Meta / Google / IronSource / 通用）===== */
+/* 商店連結（沒有歸因）*/
 var STORE_URL='https://play.google.com/store/apps/details?id=com.userjoy.rte&hl=zh_TW';
+
+/* AppsFlyer OneLink（雙平台：iOS→App Store、Android→Google Play，並帶歸因參數）
+   pid=HTML廣告 由連結本身帶；af_ad 用來分辨是哪一支素材。
+   留空字串就會退回 STORE_URL。 */
+var ONELINK_URL='https://go.onelink.me/j0VR/htmlad?c=s87_0826&af_ad=s87_return';
+
+/* 目的地：有 OneLink 就用 OneLink。
+   注意：在 Meta / Google 的廣告容器內，目的地是由平台的廣告設定決定，
+   FbPlayableAd / ExitApi 會先被呼叫並直接 return，OneLink 不會被用到——
+   這是刻意的，不能自己導轉，否則會破壞平台歸因。
+   只有在自有媒體（官網、LINE、KOL、QR、內部測試頁）這種沒有廣告容器的環境，
+   才會走到 mraid / window.open，這時 OneLink 生效、AppsFlyer 才抓得到來源與安裝。 */
+function ctaUrl(){ return ONELINK_URL || STORE_URL }
+
 function clickThrough(){
   try{ if(window.FbPlayableAd&&FbPlayableAd.onCTAClick){FbPlayableAd.onCTAClick();return;} }catch(e){}
   try{ if(window.ExitApi&&ExitApi.exit){ExitApi.exit();return;} }catch(e){}
-  try{ if(window.mraid&&mraid.open){mraid.open(STORE_URL);return;} }catch(e){}
+  try{ if(window.mraid&&mraid.open){mraid.open(ctaUrl());return;} }catch(e){}
   try{ if(window.dapi&&dapi.openStoreUrl){dapi.openStoreUrl();return;} }catch(e){}
-  try{ window.open(STORE_URL,'_blank'); }catch(e){}
+  try{ window.open(ctaUrl(),'_blank'); }catch(e){}
 }
 
 /* ===== 資源：w 木材 / i 鐵礦 / t 兵力 ===== */
