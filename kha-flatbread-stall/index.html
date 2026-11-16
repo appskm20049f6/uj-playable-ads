@@ -62,6 +62,8 @@ button{font-family:inherit;cursor:pointer}
 .tray{position:relative;width:140px;height:86px;border-radius:12px;background:linear-gradient(#d9dde0,#9aa1a6);border:4px solid #4a4f53;box-shadow:0 5px 0 rgba(0,0,0,.35);padding:0;overflow:hidden}
 .tray canvas{position:absolute;left:6px;top:6px;width:120px;height:66px;border-radius:6px;background:#5d6468}
 .tray .lab{position:absolute;left:0;right:0;bottom:0;font-size:15px;font-weight:900;color:#fff;background:rgba(43,23,8,.72);padding:1px 0}
+.key{position:absolute;right:4px;top:4px;z-index:2;min-width:24px;height:24px;padding:0 5px;border-radius:7px;background:#fff;border:2px solid #2b1708;color:#2b1708;font-size:15px;font-weight:900;line-height:20px;text-align:center;box-shadow:0 2px 0 rgba(0,0,0,.35)}
+#fire .key{right:-14px;top:-12px}#clear .key{right:-10px;top:-12px}
 .tray:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.35)}
 .tray.hint{border-color:#ffd84a;box-shadow:0 0 0 4px rgba(255,216,74,.55),0 5px 0 rgba(0,0,0,.35);animation:glow .6s infinite alternate}
 @keyframes glow{to{box-shadow:0 0 0 9px rgba(255,216,74,.25),0 5px 0 rgba(0,0,0,.35)}}
@@ -136,10 +138,10 @@ table.lb tr.me td{background:#ffe38f}
   <div class="pill" id="time"><span class="ico">⏱</span><span id="sec">60</span></div>
 
   <div id="trays"></div>
-  <button id="clear"><b>🗑</b><span data-t="clear"></span></button>
+  <button id="clear"><span class="key">R</span><b>🗑</b><span data-t="clear"></span></button>
   <div id="board"></div>
   <canvas id="bing" width="500" height="500"></canvas>
-  <div id="oven"><div id="pot"></div><div id="mouth"></div><button id="fire"><b>🔥</b><span data-t="bake"></span></button></div>
+  <div id="oven"><div id="pot"></div><div id="mouth"></div><button id="fire"><span class="key" data-t="space"></span><b>🔥</b><span data-t="bake"></span></button></div>
 
   <!-- start -->
   <div class="ov show" id="ovStart"><div class="card">
@@ -190,8 +192,8 @@ var TOPS=[
  {id:'sauce',zh:'辣醬',en:'Chili'}
 ];
 var T={
- zh:{title:'群英烙餅攤',how:'六位武將輪流來點餅！照著訂單點配料，數量要剛剛好，再按「烤」出餅。<br>60 秒內賺越多金幣越好，連續做對還有加成。',start:'開始營業',board:'排行榜',timeup:'時間到！',save:'登錄排行榜',skip:'不登錄',again:'再玩一次',reset:'清空紀錄',clear:'重做',bake:'烤',wants:' 想要：',info:'做對 {n} 份　最高連擊 {c}',name:'輸入名字',rank:'名次',player:'玩家',score:'金幣',served:'份數',none:'還沒有紀錄，來當第一名！',combo:'連擊 x',late:'等太久走了',wrong:'做錯了！',confirm:'確定要清空這台裝置上的排行榜？',anon:'無名小卒'},
- en:{title:"Heroes' Flatbread Stall",how:'Six heroes take turns ordering! Tap toppings to match the order exactly, then hit BAKE.<br>Earn as many coins as you can in 60 seconds. Streaks pay extra.',start:'Open Stall',board:'Leaderboard',timeup:"Time's up!",save:'Save Score',skip:'Skip',again:'Play Again',reset:'Clear Records',clear:'Redo',bake:'BAKE',wants:' wants:',info:'{n} served · best streak {c}',name:'Your name',rank:'#',player:'Player',score:'Coins',served:'Served',none:'No records yet. Be the first!',combo:'Streak x',late:'Left waiting',wrong:'Wrong order!',confirm:'Clear the leaderboard on this device?',anon:'Nameless'}
+ zh:{title:'群英烙餅攤',how:'六位武將輪流來點餅！照著訂單點配料，數量要剛剛好，再按「烤」出餅。<br>60 秒內賺越多金幣越好，連續做對還有加成。<br>鍵盤：1–5 放配料、空白鍵 烤、R 重做。',space:'空白鍵',start:'開始營業',board:'排行榜',timeup:'時間到！',save:'登錄排行榜',skip:'不登錄',again:'再玩一次',reset:'清空紀錄',clear:'重做',bake:'烤',wants:' 想要：',info:'做對 {n} 份　最高連擊 {c}',name:'輸入名字',rank:'名次',player:'玩家',score:'金幣',served:'份數',none:'還沒有紀錄，來當第一名！',combo:'連擊 x',late:'等太久走了',wrong:'做錯了！',confirm:'確定要清空這台裝置上的排行榜？',anon:'無名小卒'},
+ en:{title:"Heroes' Flatbread Stall",how:'Six heroes take turns ordering! Tap toppings to match the order exactly, then hit BAKE.<br>Earn as many coins as you can in 60 seconds. Streaks pay extra.<br>Keyboard: 1–5 toppings, Space to bake, R to redo.',space:'Space',start:'Open Stall',board:'Leaderboard',timeup:"Time's up!",save:'Save Score',skip:'Skip',again:'Play Again',reset:'Clear Records',clear:'Redo',bake:'BAKE',wants:' wants:',info:'{n} served · best streak {c}',name:'Your name',rank:'#',player:'Player',score:'Coins',served:'Served',none:'No records yet. Be the first!',combo:'Streak x',late:'Left waiting',wrong:'Wrong order!',confirm:'Clear the leaderboard on this device?',anon:'Nameless'}
 };
 var lang='zh';
 try{lang=localStorage.getItem(LANG_KEY)||'zh'}catch(e){}
@@ -386,6 +388,7 @@ TOPS.forEach(function(tp){
   var b=document.createElement('button');b.className='tray';b.dataset.id=tp.id;
   var cv=document.createElement('canvas');cv.width=240;cv.height=152;fillTray(cv,tp.id);b.appendChild(cv);
   var l=document.createElement('span');l.className='lab';b.appendChild(l);
+  var kk=document.createElement('span');kk.className='key';kk.textContent=TOPS.indexOf(tp)+1;b.appendChild(kk);
   b.addEventListener('pointerdown',function(e){e.preventDefault();addTop(tp.id)});
   $('trays').appendChild(b);
 });
@@ -399,6 +402,16 @@ $('name').addEventListener('keydown',function(e){if(e.key==='Enter')saveScore()}
 $('btnReset').onclick=function(){if(confirm(t('confirm'))){saveLb([]);showLb()}};
 $('btnLang').onclick=function(){lang=lang==='zh'?'en':'zh';try{localStorage.setItem(LANG_KEY,lang)}catch(e){}applyLang()};
 $('btnSnd').onclick=function(){muted=!muted;this.textContent=muted?'🔇':'🔊'};
+addEventListener('keydown',function(e){
+  if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;
+  if(e.ctrlKey||e.altKey||e.metaKey)return;
+  var k=e.key,c=e.code||'';
+  if(k===' '||c==='Space'){e.preventDefault();if(!e.repeat)bake();return}
+  if(k==='r'||k==='R'||c==='KeyR'){e.preventDefault();if(!e.repeat)clearBing();return}
+  var m=/^(?:Digit|Numpad)([1-5])$/.exec(c),n=m?+m[1]:(/^[1-5]$/.test(k)?+k:0);
+  if(n){e.preventDefault();if(e.repeat)return;addTop(TOPS[n-1].id);
+    var el=document.querySelector('.tray[data-id="'+TOPS[n-1].id+'"]');if(el){el.style.transform='translateY(3px)';setTimeout(function(){el.style.transform=''},90)}}
+});
 setCustomers();drawBing();applyLang();
 window.__game={S:S,addTop:addTop,bake:bake};
 })();
