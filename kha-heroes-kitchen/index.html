@@ -59,6 +59,8 @@ const ready = n => IMGS[n] && IMGS[n].complete && IMGS[n].naturalWidth > 0;
 /* ---------- 場景 ---------- */
 const FL = { x: 110, y: 112, x2: 1492, y2: 640 };
 const crates = ING_ORDER.map((id, i) => ({ kind: 'crate', id, x: 130 + i * 70.5, y: 113, w: 64, h: 66 }));
+// 最左邊的箱子正下方是炒鍋，角色站不到它前面；加一塊隱形的互動區（箱子與炒鍋之間的縫），從右側面向左就拿得到
+crates[0].alt = { x: 150, y: 179, w: 62, h: 28 };
 const stations = [
   { kind: 'station', type: 'wok', x: 109, y: 207, w: 93, h: 99 },
   { kind: 'station', type: 'pot', x: 109, y: 322, w: 93, h: 99 },
@@ -121,9 +123,11 @@ function target(p) {
   const fx = p.x + p.dx * 26, fy = p.y + p.dy * 26;
   let best = null, bd = 48;
   for (const o of inter) {
-    const cx = clamp(fx, o.x, o.x + o.w), cy = clamp(fy, o.y, o.y + o.h);
-    const d = Math.hypot(fx - cx, fy - cy);
-    if (d < bd) { bd = d; best = o; }
+    for (const r of o.alt ? [o, o.alt] : [o]) {
+      const cx = clamp(fx, r.x, r.x + r.w), cy = clamp(fy, r.y, r.y + r.h);
+      const d = Math.hypot(fx - cx, fy - cy);
+      if (d < bd) { bd = d; best = o; }
+    }
   }
   return best;
 }
@@ -491,7 +495,7 @@ function draw() {
 }
 
 G.mode = 1; resetDay(); G.state = 'menu';
-window.__game = { hand, broom, update, startGame, stations, tables, slots, board, target };
+window.__game = { hand, broom, update, startGame, stations, tables, slots, board, target, blocked, inter };
 let last = performance.now();
 function loop(now) { const dt = Math.min(0.05, (now - last) / 1000); last = now; update(dt); draw(); requestAnimationFrame(loop); }
 requestAnimationFrame(loop);
