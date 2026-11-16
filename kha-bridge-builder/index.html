@@ -16,7 +16,10 @@ canvas{position:absolute;left:0;top:0;width:1600px;height:900px;cursor:crosshair
 #budget .bar{position:absolute;left:78px;top:46px;width:214px;height:12px;border-radius:6px;background:#7a6a4a;overflow:hidden}
 #budget .bar i{display:block;height:100%;width:0;background:#8fd15a;border-radius:6px;transition:width .15s}
 #budget.over .txt{color:#ff8d7a}#budget.over .bar i{background:#e8553d}
-#level{left:728px;top:16px;width:144px;height:58px;line-height:58px;text-align:center;font-size:36px}
+#level{left:660px;top:16px;width:280px;height:58px;line-height:58px;text-align:center;font-size:30px;display:flex;justify-content:space-between;align-items:center}
+#level span{flex:1;white-space:nowrap}#level b{width:56px;cursor:pointer;font-size:26px;color:#cfe0ea}#level b.off{opacity:.25;cursor:default}#level i{font-style:normal;color:#ffd84a;font-size:26px;margin-left:6px}
+.mat.ban{opacity:.3;cursor:not-allowed}
+#msg button+button{margin-left:14px;background:#5d7f95}
 #hint{position:absolute;left:50%;transform:translateX(-50%);top:84px;padding:4px 16px;border-radius:16px;background:rgba(30,45,60,.55);white-space:nowrap;color:#fff;font-size:20px;pointer-events:none}
 #hint:empty{display:none}
 .sq{position:absolute;bottom:36px;width:118px;height:132px;border-radius:18px;border:5px solid #e9e4d2;background:#8d8a7c;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 0 rgba(0,0,0,.3)}
@@ -47,7 +50,7 @@ canvas{position:absolute;left:0;top:0;width:1600px;height:900px;cursor:crosshair
 <div id="stage">
   <canvas id="cv" width="1600" height="900"></canvas>
   <div id="budget" class="panel"><div class="coin"></div><div class="txt">0 / 2,000</div><div class="bar"><i></i></div></div>
-  <div id="level" class="panel">3 - 7</div>
+  <div id="level" class="panel"><b id="lvPrev">◀</b><span id="lvName"></span><b id="lvNext">▶</b></div>
   <div id="hint"></div>
   <div id="undo" class="sq" title="復原 (Ctrl+Z)"><svg viewBox="0 0 70 70"><path d="M22 12 L8 28 L24 40 L22 31 Q48 28 48 44 Q48 56 30 56 L30 64 Q58 64 58 44 Q58 20 22 22 Z" fill="#f4f1e6"/></svg></div>
   <div id="trash" class="sq" title="刪除模式"><svg viewBox="0 0 70 70"><path d="M14 20h42v6H14zM26 12h18v8H26zM18 28h34l-3 34H21z" fill="#f4f1e6"/><path d="M28 34v22M35 34v22M42 34v22" stroke="#8d8a7c" stroke-width="3"/></svg></div>
@@ -58,12 +61,27 @@ canvas{position:absolute;left:0;top:0;width:1600px;height:900px;cursor:crosshair
     <div class="mat" data-m="stone"><span class="n">石材・重而強</span><img data-i="stone" alt=""><div class="p">120<b></b></div></div>
   </div>
   <div id="play" title="發車 (空白鍵)"><svg viewBox="0 0 90 90"><path id="playIcon" d="M24 12 L76 45 L24 78Z" fill="#e6f8d0"/></svg></div>
-  <div id="msg" class="panel"><h2></h2><p></p><button></button></div>
+  <div id="msg" class="panel"><h2></h2><p></p><button id="msgA"></button><button id="msgB"></button></div>
 </div>
 <script>
 (()=>{
 'use strict';
-const W=1600,H=900,GY=480,LX=440,RX=1240,WATER=720,G=40,MAXLEN=170,BUDGET=2000,UNIT=160;
+const W=1600,H=900,GY=480,LX=440,RX=1240,WATER=720,G=40,MAXLEN=170,UNIT=160;
+// 關卡：low=崖壁下錨點、piers=水中石墩（頂端錨點）、posts=崖邊立柱（頂端錨點）、cart=糧車重量、ban=缺貨材料
+const LEVELS=[
+  {title:'石墩便橋',budget:600,piers:[[680,480],[1000,480]],tip:'從紅色錨點拖曳蓋橋，木板才能走車，蓋好按 ▶ 發車'},
+  {title:'水中石墩',budget:800,piers:[[840,600]],tip:'石墩比橋面低，用竹子從石墩往上撐住橋面'},
+  {title:'吊橋',budget:1100,posts:[[440,320],[1240,320]],tip:'繩索只能受拉：從立柱頂端拉主索，再把橋面吊起來'},
+  {title:'缺竹之日',budget:950,posts:[[440,320],[1240,320]],piers:[[840,640]],ban:['bamboo'],tip:'竹子缺貨，只能用木板、繩索和石材'},
+  {title:'崖壁支撐',budget:1750,low:true,tip:'崖壁下方也有錨點，桁架可以蓋在橋面下'},
+  {title:'無依無靠',budget:1650,tip:'只剩兩岸的錨點，靠三角桁架撐起整座橋'},
+  {title:'重裝糧車',budget:1800,low:true,cart:7,tip:'這趟糧車特別重，注意變紅的桿件'},
+  {title:'丞相的考驗',budget:1600,piers:[[840,600]],cart:7,tip:'重車加上低石墩，預算也不寬裕'}
+];
+LEVELS.forEach((L,i)=>L.name='第 '+(i+1)+' 關');
+let LV=0,budget=LEVELS[0].budget,designs={},best={};
+try{best=JSON.parse(localStorage.getItem('kha_bridge_best')||'{}')||{};}catch(e){best={};}
+
 const GRAV=500,R=26,SPEED=110,WL=120,SUB=16,DT=1/60/SUB;
 const MATS={
   wood:{price:100,road:true,w:0.008,str:14000,ea:600000,color:'#9a6234',edge:'#553116',lw:13},
@@ -78,8 +96,16 @@ document.querySelectorAll('.mat img').forEach(e=>e.src=ASSETS[e.dataset.i]);
 const cv=$('#cv'),c=cv.getContext('2d'),stage=$('#stage');
 
 // ---------- 狀態 ----------
-let nodes=[],beams=[],history=[],mat='bamboo',erase=false,from=null,dragging=false,cursor={x:0,y:0},sim=null;
-function reset(){nodes=[[LX,GY],[RX,GY],[LX,GY+120],[RX,GY+120]].map(p=>({x:p[0],y:p[1],fixed:true}));beams=[];}
+let nodes=[],beams=[],history=[],mat='wood',erase=false,from=null,dragging=false,cursor={x:0,y:0},sim=null,box=null;
+function anchors(){const L=LEVELS[LV],a=[[LX,GY],[RX,GY]];if(L.low)a.push([LX,GY+120],[RX,GY+120]);return a.concat(L.piers||[],L.posts||[]);}
+function reset(){nodes=anchors().map(p=>({x:p[0],y:p[1],fixed:true}));beams=[];}
+function setLevel(i){
+  if(i<0||i>=LEVELS.length)return;
+  if(sim)stopSim();designs[LV]=ser();LV=i;budget=LEVELS[i].budget;history=[];from=null;erase=false;
+  if(designs[i])load(designs[i]);else reset();
+  if((LEVELS[i].ban||[]).includes(mat))mat=Object.keys(MATS).find(m=>!(LEVELS[i].ban||[]).includes(m));
+  ui();
+}
 const ser=()=>JSON.stringify({n:nodes.map(n=>[n.x,n.y,n.fixed?1:0]),b:beams.map(b=>[nodes.indexOf(b.a),nodes.indexOf(b.b),b.mat])});
 function load(s){const d=typeof s==='string'?JSON.parse(s):s;nodes=d.n.map(n=>({x:n[0],y:n[1],fixed:!!n[2]}));beams=d.b.map(b=>({a:nodes[b[0]],b:nodes[b[1]],mat:b[2]}));from=null;ui();}
 const save=()=>{history.push(ser());if(history.length>200)history.shift();};
@@ -112,13 +138,22 @@ function removeAt(p){
   if(!best)return;save();beams.splice(beams.indexOf(best),1);
   nodes=nodes.filter(n=>n.fixed||beams.some(b=>b.a===n||b.b===n));ui();
 }
+function cross(p,q,r,t){const d=(a,b,c)=>(b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);return d(p,q,r)*d(p,q,t)<0&&d(r,t,p)*d(r,t,q)<0;}
+function removeBox(bx){
+  const x0=Math.min(bx.x0,bx.x1),x1=Math.max(bx.x0,bx.x1),y0=Math.min(bx.y0,bx.y1),y1=Math.max(bx.y0,bx.y1);
+  const inside=p=>p.x>=x0&&p.x<=x1&&p.y>=y0&&p.y<=y1,cs=[{x:x0,y:y0},{x:x1,y:y0},{x:x1,y:y1},{x:x0,y:y1}];
+  const hit=b=>inside(b.a)||inside(b.b)||cs.some((c1,i)=>cross(b.a,b.b,c1,cs[(i+1)%4]));
+  if(!beams.some(hit))return;
+  save();beams=beams.filter(b=>!hit(b));
+  nodes=nodes.filter(n=>n.fixed||beams.some(b=>b.a===n||b.b===n));ui();
+}
 
 // ---------- 物理 ----------
 function startSim(){
   from=null;dragging=false;
   const sn=nodes.map(n=>({x:n.x,y:n.y,vx:0,vy:0,fx:0,fy:0,m:0.1,fixed:n.fixed}));
   const sb=beams.map(b=>{const a=sn[nodes.indexOf(b.a)],d=sn[nodes.indexOf(b.b)],M=MATS[b.mat],L=len(a,d);a.m+=M.w*L/2;d.m+=M.w*L/2;return{a,b:d,L0:L,M,mat:b.mat,stress:0,broken:false};});
-  const wh=[150,150+WL].map(x=>({x,y:GY-R,vx:0,vy:0,fx:0,fy:0,m:4,rot:0}));
+  const wh=[150,150+WL].map(x=>({x,y:GY-R,vx:0,vy:0,fx:0,fy:0,m:LEVELS[LV].cart||4,rot:0}));
   sim={t:0,nodes:sn,beams:sb,wheels:wh,state:'run',broke:0,acc:0};
   $('#msg').style.display='none';ui();
 }
@@ -171,10 +206,11 @@ function step(s){
 }
 function finish(s,r,stuck){
   s.state=r;if(s!==sim)return;
+  if(r==='win'){const k=LEVELS[LV].name,cc=cost();if(!best[k]||cc<best[k]){best[k]=cc;try{localStorage.setItem('kha_bridge_best',JSON.stringify(best));}catch(e){}}ui();}
   const m=$('#msg');m.className='panel '+r;m.style.display='block';
   m.querySelector('h2').textContent=r==='win'?'糧車過橋成功！':(stuck?'糧車卡住了…':'橋垮了！');
-  m.querySelector('p').textContent=r==='win'?`花費 ${cost().toLocaleString()} / ${BUDGET.toLocaleString()}　斷裂 ${s.broke} 根`:(stuck?'橋面沒有接通，回去補一補吧。':'糧車落水，丞相搖了搖羽扇。');
-  m.querySelector('button').textContent=r==='win'?'再蓋一座更省的':'回去修改';
+  m.querySelector('p').textContent=r==='win'?`花費 ${cost().toLocaleString()} / ${budget.toLocaleString()}　斷裂 ${s.broke} 根`+(best[LEVELS[LV].name]?`　最佳 ${best[LEVELS[LV].name].toLocaleString()}`:''):(stuck?'橋面沒有接通，回去補一補吧。':'糧車落水，丞相搖了搖羽扇。');
+  const last=LV===LEVELS.length-1;$('#msgA').textContent=r==='win'?(last?'全部過關！':'下一關'):'回去修改';$('#msgA').dataset.next=(r==='win'&&!last)?1:0;$('#msgB').textContent='再蓋一座更省的';$('#msgB').style.display=r==='win'?'':'none';
 }
 
 // ---------- 場景與人物（覺醒 Q 版素材） ----------
@@ -207,6 +243,13 @@ function drawCart(a,b){
 function draw(){
   if(IMG.bg.complete&&IMG.bg.naturalWidth)c.drawImage(IMG.bg,0,0,W,H);else{c.fillStyle='#9cc9e0';c.fillRect(0,0,W,H);}
   const tt=performance.now()/1000,st=sim?sim.state:'';
+  const Lv=LEVELS[LV];
+  for(const p of Lv.piers||[]){const x=p[0],y=p[1];c.fillStyle='#8f9296';c.fillRect(x-26,y+6,52,H-y);c.fillStyle='#a9acae';c.fillRect(x-26,y+6,18,H-y);
+    c.strokeStyle='rgba(50,55,60,.5)';c.lineWidth=2;for(let yy=y+34;yy<H;yy+=28){line(c,x-26,yy,x+26,yy);const o=((yy-y)/28|0)%2?-9:9;line(c,x+o,yy-28,x+o,yy);}
+    c.fillStyle='#b9bcbd';c.fillRect(x-32,y-4,64,14);c.strokeStyle='#5d6166';c.strokeRect(x-32,y-4,64,14);
+    c.fillStyle='rgba(38,112,170,.45)';c.fillRect(x-30,Math.max(y+10,WATER-70),60,H);}
+  for(const p of Lv.posts||[]){const x=p[0]+(p[0]<800?-10:10),y=p[1];c.strokeStyle='#4a2c14';c.lineWidth=20;c.lineCap='butt';line(c,x,GY+6,x,y-6);c.strokeStyle='#8a5530';c.lineWidth=14;line(c,x,GY+6,x,y-6);
+    c.strokeStyle='#4a2c14';c.lineWidth=7;line(c,x+(p[0]<800?-46:46),GY+2,x,GY-70);c.fillStyle='#4a2c14';c.fillRect(x-14,y-14,28,10);}
   sprite('zhaoyun',52,140,st==='win'?-Math.abs(Math.sin(tt*6))*10:0);
   sprite('simayi',1545,136,0);
   sprite('zhuge',402,140,st==='win'?-Math.abs(Math.sin(tt*6+1))*10:(st==='fail'?Math.sin(tt*30)*1.5:0));
@@ -217,6 +260,7 @@ function draw(){
     if(from){const t=target(from,cursor);if(t){drawBeam(from,t,mat,0,.55);c.fillStyle='#ffd83a';c.strokeStyle='#8a6a00';c.lineWidth=3;c.beginPath();c.arc(t.x,t.y,11,0,7);c.fill();c.stroke();}
       c.strokeStyle='#fff';c.lineWidth=3;c.beginPath();c.arc(from.x,from.y,20,0,7);c.stroke();}
     for(const n of nodes)drawNode(n);
+    if(box){c.fillStyle='rgba(230,60,40,.18)';c.strokeStyle='#e8402c';c.lineWidth=3;c.setLineDash([10,7]);c.fillRect(box.x0,box.y0,box.x1-box.x0,box.y1-box.y0);c.strokeRect(box.x0,box.y0,box.x1-box.x0,box.y1-box.y0);c.setLineDash([]);}
     drawCart({x:150,y:GY-R,rot:0},{x:150+WL,y:GY-R});
   }else{
     for(const b of sim.beams)if(!b.broken)drawBeam(b.a,b.b,b.mat,b.stress);
@@ -227,13 +271,15 @@ function draw(){
 }
 function ui(){
   const u=cost(),b=$('#budget');
-  b.querySelector('.txt').textContent=`${u.toLocaleString()} / ${BUDGET.toLocaleString()}`;
-  b.querySelector('i').style.width=Math.min(100,u/BUDGET*100)+'%';b.classList.toggle('over',u>BUDGET);
+  b.querySelector('.txt').textContent=`${u.toLocaleString()} / ${budget.toLocaleString()}`;
+  b.querySelector('i').style.width=Math.min(100,u/budget*100)+'%';b.classList.toggle('over',u>budget);
+  const L=LEVELS[LV];$('#lvName').innerHTML=L.name+(best[L.name]?'<i>★</i>':'');$('#lvPrev').classList.toggle('off',LV===0);$('#lvNext').classList.toggle('off',LV===LEVELS.length-1);
+  document.querySelectorAll('.mat').forEach(e=>e.classList.toggle('ban',(L.ban||[]).includes(e.dataset.m)));
   document.querySelectorAll('.mat').forEach(e=>e.classList.toggle('sel',e.dataset.m===mat));
   $('#trash').classList.toggle('on',erase);
   $('#play').classList.toggle('stop',!!sim);
   $('#playIcon').setAttribute('d',sim?'M22 22H68V68H22Z':'M24 12 L76 45 L24 78Z');
-  $('#hint').textContent=sim?'':(u>BUDGET?'超出預算了，刪掉一些再發車':(erase?'刪除模式：點橋樑刪除，再按一次垃圾桶離開':'從紅色錨點或接點拖曳蓋橋　木板／石材才能走車　右鍵刪除　▶ 發車'));
+  $('#hint').textContent=sim?'':(u>budget?'超出預算了，刪掉一些再發車':(erase?'刪除模式：點橋樑刪除，或拖曳框選一次刪多根；再按一次垃圾桶離開':`【${L.title}】${L.tip}`));
   for(const s of['#undo','#trash','#mats'])$(s).style.opacity=sim?.45:1;
 }
 
@@ -243,27 +289,30 @@ cv.addEventListener('contextmenu',e=>e.preventDefault());
 cv.addEventListener('pointerdown',e=>{
   if(sim)return;const p=pos(e);cursor=p;
   if(e.button===2){if(from)from=null;else removeAt(p);return;}
-  if(erase){removeAt(p);return;}
+  if(erase){box={x0:p.x,y0:p.y,x1:p.x,y1:p.y};cv.setPointerCapture(e.pointerId);return;}
   if(from&&!dragging){create(from,target(from,p));from=null;return;}
   const n=nodeAt(p);if(n){from=n;dragging=true;cv.setPointerCapture(e.pointerId);}
 });
-cv.addEventListener('pointermove',e=>{cursor=pos(e);});
+cv.addEventListener('pointermove',e=>{cursor=pos(e);if(box){box.x1=cursor.x;box.y1=cursor.y;}});
+cv.addEventListener('pointercancel',()=>{box=null;dragging=false;});
 cv.addEventListener('pointerup',e=>{
+  if(box){const bx=box;box=null;if(Math.hypot(bx.x1-bx.x0,bx.y1-bx.y0)<14)removeAt({x:bx.x0,y:bx.y0});else removeBox(bx);return;}
   if(!dragging||!from)return;dragging=false;cursor=pos(e);
   if(len(cursor,from)>20){create(from,target(from,cursor));from=null;}
 });
-$('#mats').addEventListener('click',e=>{const m=e.target.closest('.mat');if(m&&!sim){mat=m.dataset.m;erase=false;ui();}});
+$('#mats').addEventListener('click',e=>{const m=e.target.closest('.mat');if(m&&!sim&&!m.classList.contains('ban')){mat=m.dataset.m;erase=false;ui();}});
 const undo=()=>{if(sim||!history.length)return;load(history.pop());};
 $('#undo').onclick=undo;
-$('#trash').onclick=()=>{if(sim)return;erase=!erase;from=null;ui();};
-const toggle=()=>{if(sim)stopSim();else if(cost()<=BUDGET)startSim();};
+$('#trash').onclick=()=>{if(sim)return;erase=!erase;from=null;box=null;ui();};
+const toggle=()=>{if(sim)stopSim();else if(cost()<=budget)startSim();};
 $('#play').onclick=toggle;
-$('#msg button').onclick=stopSim;
+$('#msgA').onclick=()=>{if($('#msgA').dataset.next==='1')setLevel(LV+1);else stopSim();};$('#msgB').onclick=stopSim;
+$('#lvPrev').onclick=()=>setLevel(LV-1);$('#lvNext').onclick=()=>setLevel(LV+1);
 addEventListener('keydown',e=>{
   if(e.key===' '){e.preventDefault();toggle();}
   else if(e.key==='Escape'){from=null;erase=false;ui();}
   else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z')undo();
-  else if('1234'.includes(e.key)&&!sim){mat=Object.keys(MATS)[+e.key-1];erase=false;ui();}
+  else if('1234'.includes(e.key)&&!sim&&!(LEVELS[LV].ban||[]).includes(Object.keys(MATS)[+e.key-1])){mat=Object.keys(MATS)[+e.key-1];erase=false;ui();}
 });
 function fit(){const s=Math.min(innerWidth/W,innerHeight/H);stage.style.transform=`translate(-50%,-50%) scale(${s})`;}
 addEventListener('resize',fit);
@@ -277,7 +326,7 @@ function frame(ts){
 reset();fit();ui();requestAnimationFrame(frame);
 
 // 測試用
-window.game={load,ser,cost,start:startSim,stop:stopSim,get sim(){return sim;},
+window.game={LEVELS,setLevel,get lv(){return LV;},load,ser,cost,start:startSim,stop:stopSim,get sim(){return sim;},
   run(sec){if(!sim)startSim();for(let i=0;i<sec*60*SUB&&sim.state==='run';i++)step(sim);return{state:sim.state,t:+sim.t.toFixed(2),broke:sim.broke,x:Math.round(sim.wheels[0].x),max:+Math.max(...sim.beams.map(b=>b.broken?0:b.stress)).toFixed(2)};}};
 })();
 </script>
