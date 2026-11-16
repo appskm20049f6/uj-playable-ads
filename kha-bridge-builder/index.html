@@ -44,6 +44,17 @@ canvas{position:absolute;left:0;top:0;width:1600px;height:900px;cursor:crosshair
 #msg p{margin:0 0 20px;font-size:22px;font-weight:400;color:#e6ecef}
 #msg button{font:inherit;font-size:24px;padding:10px 30px;border-radius:12px;border:0;background:#6dbb45;color:#fff;cursor:pointer;font-weight:700}
 #msg.fail h2{color:#ff9a85}#msg.win h2{color:#ffe07a}
+#menu{left:952px;top:16px;width:104px;height:58px;line-height:58px;text-align:center;font-size:24px;cursor:pointer}
+#select{position:absolute;left:0;top:0;width:1600px;height:900px;background:rgba(12,26,36,.74);display:flex;align-items:center;justify-content:center;z-index:5}
+#select .box{text-align:center;color:#fff}
+#select h1{margin:0;font-size:76px;letter-spacing:10px;color:#ffe07a;text-shadow:0 5px 0 #7a4a12,0 8px 18px rgba(0,0,0,.5)}
+#select p{margin:10px 0 34px;font-size:24px;color:#dbe6ec}
+#grid{display:grid;grid-template-columns:repeat(4,270px);gap:22px}
+.lv{height:170px;border-radius:18px;background:#ecd392;border:5px solid #fff6d6;box-sizing:border-box;color:#4a3b2e;cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,.35);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700}
+.lv:active{transform:translateY(3px)}
+.lv b{font-size:38px}.lv span{font-size:24px;margin-top:2px}.lv em{font-style:normal;font-size:20px;margin-top:10px;color:#7a5a1e}
+.lv.done{background:#bfe39a;border-color:#eefadf}.lv.done em{color:#2f6a1e}
+.lv.lock{background:#5d5348;border-color:#7a7064;color:#a99e8e;cursor:not-allowed}.lv.lock em{color:#a99e8e}.lv.lock:active{transform:none}
 </style>
 </head>
 <body>
@@ -51,6 +62,7 @@ canvas{position:absolute;left:0;top:0;width:1600px;height:900px;cursor:crosshair
   <canvas id="cv" width="1600" height="900"></canvas>
   <div id="budget" class="panel"><div class="coin"></div><div class="txt">0 / 2,000</div><div class="bar"><i></i></div></div>
   <div id="level" class="panel"><b id="lvPrev">◀</b><span id="lvName"></span><b id="lvNext">▶</b></div>
+  <div id="menu" class="panel">選關</div>
   <div id="hint"></div>
   <div id="undo" class="sq" title="復原 (Ctrl+Z)"><svg viewBox="0 0 70 70"><path d="M22 12 L8 28 L24 40 L22 31 Q48 28 48 44 Q48 56 30 56 L30 64 Q58 64 58 44 Q58 20 22 22 Z" fill="#f4f1e6"/></svg></div>
   <div id="trash" class="sq" title="刪除模式"><svg viewBox="0 0 70 70"><path d="M14 20h42v6H14zM26 12h18v8H26zM18 28h34l-3 34H21z" fill="#f4f1e6"/><path d="M28 34v22M35 34v22M42 34v22" stroke="#8d8a7c" stroke-width="3"/></svg></div>
@@ -61,6 +73,7 @@ canvas{position:absolute;left:0;top:0;width:1600px;height:900px;cursor:crosshair
     <div class="mat" data-m="stone"><span class="n">石材・重而強</span><img data-i="stone" alt=""><div class="p">120<b></b></div></div>
   </div>
   <div id="play" title="發車 (空白鍵)"><svg viewBox="0 0 90 90"><path id="playIcon" d="M24 12 L76 45 L24 78Z" fill="#e6f8d0"/></svg></div>
+  <div id="select"><div class="box"><h1>群英造橋</h1><p>幫蜀軍糧車蓋橋過河　過關才會解鎖下一關</p><div id="grid"></div></div></div>
   <div id="msg" class="panel"><h2></h2><p></p><button id="msgA"></button><button id="msgB"></button></div>
 </div>
 <script>
@@ -99,8 +112,15 @@ const cv=$('#cv'),c=cv.getContext('2d'),stage=$('#stage');
 let nodes=[],beams=[],history=[],mat='wood',erase=false,from=null,dragging=false,cursor={x:0,y:0},sim=null,box=null;
 function anchors(){const L=LEVELS[LV],a=[[LX,GY],[RX,GY]];if(L.low)a.push([LX,GY+120],[RX,GY+120]);return a.concat(L.piers||[],L.posts||[]);}
 function reset(){nodes=anchors().map(p=>({x:p[0],y:p[1],fixed:true}));beams=[];}
-function setLevel(i){
-  if(i<0||i>=LEVELS.length)return;
+const unlocked=i=>i===0||!!best[LEVELS[i-1].name];
+function showSelect(v){
+  if(v){if(sim)stopSim();
+    $('#grid').innerHTML=LEVELS.map((L,i)=>{const d=best[L.name],ok=unlocked(i);
+      return `<div class="lv ${d?'done':(ok?'':'lock')}" data-i="${i}"><b>${L.name}</b><span>${L.title}</span><em>${d?'★ 最佳 '+d.toLocaleString():(ok?'預算 '+L.budget.toLocaleString():'🔒 未解鎖')}</em></div>`;}).join('');}
+  $('#select').style.display=v?'flex':'none';
+}
+function setLevel(i,force){
+  if(i<0||i>=LEVELS.length||(!force&&!unlocked(i)))return;
   if(sim)stopSim();designs[LV]=ser();LV=i;budget=LEVELS[i].budget;history=[];from=null;erase=false;
   if(designs[i])load(designs[i]);else reset();
   if((LEVELS[i].ban||[]).includes(mat))mat=Object.keys(MATS).find(m=>!(LEVELS[i].ban||[]).includes(m));
@@ -273,7 +293,7 @@ function ui(){
   const u=cost(),b=$('#budget');
   b.querySelector('.txt').textContent=`${u.toLocaleString()} / ${budget.toLocaleString()}`;
   b.querySelector('i').style.width=Math.min(100,u/budget*100)+'%';b.classList.toggle('over',u>budget);
-  const L=LEVELS[LV];$('#lvName').innerHTML=L.name+(best[L.name]?'<i>★</i>':'');$('#lvPrev').classList.toggle('off',LV===0);$('#lvNext').classList.toggle('off',LV===LEVELS.length-1);
+  const L=LEVELS[LV];$('#lvName').innerHTML=L.name+(best[L.name]?'<i>★</i>':'');$('#lvPrev').classList.toggle('off',LV===0);$('#lvNext').classList.toggle('off',LV===LEVELS.length-1||!unlocked(LV+1));
   document.querySelectorAll('.mat').forEach(e=>e.classList.toggle('ban',(L.ban||[]).includes(e.dataset.m)));
   document.querySelectorAll('.mat').forEach(e=>e.classList.toggle('sel',e.dataset.m===mat));
   $('#trash').classList.toggle('on',erase);
@@ -306,9 +326,12 @@ $('#undo').onclick=undo;
 $('#trash').onclick=()=>{if(sim)return;erase=!erase;from=null;box=null;ui();};
 const toggle=()=>{if(sim)stopSim();else if(cost()<=budget)startSim();};
 $('#play').onclick=toggle;
-$('#msgA').onclick=()=>{if($('#msgA').dataset.next==='1')setLevel(LV+1);else stopSim();};$('#msgB').onclick=stopSim;
+$('#msgA').onclick=()=>{if($('#msgA').dataset.next==='1')setLevel(LV+1);else if(sim&&sim.state==='win')showSelect(true);else stopSim();};
+$('#menu').onclick=()=>showSelect(true);
+$('#grid').addEventListener('click',e=>{const d=e.target.closest('.lv');if(!d||d.classList.contains('lock'))return;setLevel(+d.dataset.i);showSelect(false);});$('#msgB').onclick=stopSim;
 $('#lvPrev').onclick=()=>setLevel(LV-1);$('#lvNext').onclick=()=>setLevel(LV+1);
 addEventListener('keydown',e=>{
+  if($('#select').style.display!=='none')return;
   if(e.key===' '){e.preventDefault();toggle();}
   else if(e.key==='Escape'){from=null;erase=false;ui();}
   else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z')undo();
@@ -323,10 +346,10 @@ function frame(ts){
   if(sim){sim.acc+=dt;while(sim.acc>=1/60){for(let i=0;i<SUB;i++)step(sim);sim.acc-=1/60;}}
   draw();requestAnimationFrame(frame);
 }
-reset();fit();ui();requestAnimationFrame(frame);
+reset();fit();ui();showSelect(true);requestAnimationFrame(frame);
 
 // 測試用
-window.game={LEVELS,setLevel,get lv(){return LV;},load,ser,cost,start:startSim,stop:stopSim,get sim(){return sim;},
+window.game={LEVELS,setLevel:i=>{showSelect(false);setLevel(i,true);},showSelect,get lv(){return LV;},load,ser,cost,start:startSim,stop:stopSim,get sim(){return sim;},
   run(sec){if(!sim)startSim();for(let i=0;i<sec*60*SUB&&sim.state==='run';i++)step(sim);return{state:sim.state,t:+sim.t.toFixed(2),broke:sim.broke,x:Math.round(sim.wheels[0].x),max:+Math.max(...sim.beams.map(b=>b.broken?0:b.stress)).toFixed(2)};}};
 })();
 </script>
