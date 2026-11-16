@@ -10,12 +10,11 @@
 ## 結構
 
 ```
-index.html      遊戲本體（配料、餅、烤爐以 canvas / CSS 繪製）
-assets/bg.jpg   攤位背景
-assets/hero_*.png  六位武將 Q 版去背圖
+index.html      遊戲本體，單一檔案：背景與六位武將 Q 版圖以 base64 內嵌，
+                配料、餅、烤爐以 canvas / CSS 繪製，離線可開
 ```
 
-這支不是單檔 playable ad，沒有 CTA 與 AppsFlyer 連結，不能直接上傳投放。
+這支是網頁小遊戲，沒有 CTA 與 AppsFlyer 連結，不能直接上傳投放。
 
 ## 素材來源
 
